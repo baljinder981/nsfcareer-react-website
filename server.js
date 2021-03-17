@@ -237,6 +237,7 @@ const {
 	getSensorDataByPlayerID,	
 	InsertNewSensorDataByPlayerID,
 	DeleteSensorDataByPlayerID,
+	updateuseraccess,
 
 } = require('./controllers/query');
 
@@ -14813,12 +14814,9 @@ function InsertSensorDataByPlayerID(sensorNewData) {
         if (sensorNewData) {
 			var datalength = sensorNewData.length;
 			var count = 0;
-			
-			console.log("sensor_Data",datalength);
 			sensorNewData.forEach(function (sensorData, index) {
 				InsertNewSensorDataByPlayerID(sensorData)
 				.then(insertData => {
-					console.log("insertData",insertData);
 					count++
 					if(count == datalength){ 
 						resolve("sucess");
@@ -14859,21 +14857,29 @@ app.post(`${apiPrefix}deleteEventByImageID`, (req, res) => {
 							var insetdata = await InsertSensorDataByPlayerID(sensorNewData);
 							deleteSimulation_imagesData(data.image_id)
 							.then(deldata => {
-								if (image_Data.root_path && image_Data.root_path != 'undefined') {
-									var rootpath = image_Data.root_path;
-									var lastchar = rootpath.slice(-1);
-									if(lastchar == "/"){
-										rootpath = image_Data.root_path;
+								console.log("image_Data 1",image_Data)
+								if (image_Data !== undefined){
+									if(image_Data.root_path && image_Data.root_path != 'undefined') {
+										var rootpath = image_Data.root_path;
+										var lastchar = rootpath.slice(-1);
+										if(lastchar == "/"){
+											rootpath = image_Data.root_path;
+										}else{
+											rootpath = image_Data.root_path+"/"; 
+										}
+										emptyBucket({ bucket_name: image_Data.bucket_name, root_path: rootpath }, function (err, data1) {
+											console.log("data1",data1);
+												res.send({
+													message: 'success',
+													status: 200
+												})
+										})
 									}else{
-										rootpath = image_Data.root_path+"/";
+										res.send({
+											message: 'success',
+											status: 200
+										})
 									}
-									emptyBucket({ bucket_name: image_Data.bucket_name, root_path: rootpath }, function (err, data1) {
-										console.log(err);
-											res.send({
-												message: 'success',
-												status: 200
-											})
-									})
 								}else{
 									res.send({
 										message: 'success',
@@ -14886,15 +14892,22 @@ app.post(`${apiPrefix}deleteEventByImageID`, (req, res) => {
 						}else{
 							deleteSimulation_imagesData(data.image_id) 
 							.then(deldata => {
-								 if (image_Data.root_path && image_Data.root_path != 'undefined') {
-									emptyBucket({ bucket_name: image_Data.bucket_name, root_path: image_Data.root_path }, function (err, data1) {										
-										console.log(err);
-										console.log(data1);
-											res.send({
-												message: 'success',
-												status: 200
-											})
-									})
+								console.log("image_Data 2",image_Data)
+								if (image_Data !== undefined){
+									 if (image_Data.root_path && image_Data.root_path != 'undefined') {
+										emptyBucket({ bucket_name: image_Data.bucket_name, root_path: image_Data.root_path }, function (err, data1) {	
+											console.log("data1",data1);
+												res.send({
+													message: 'success',
+													status: 200
+												})
+										})
+									}else{
+										res.send({
+											message: 'success',
+											status: 200
+										})
+									}
 								}else{
 									res.send({
 										message: 'success',
@@ -14929,6 +14942,23 @@ app.post(`${apiPrefix}logOut`, (req, res) => {
     res.send({
         message: "success"
     });
+})
+// update user access
+app.post(`${apiPrefix}updateuseraccess`, (req, res) => {
+	var data = req.body;
+	var cognito_id = data.data.cognito_id;
+	updateuseraccess(data) 
+	.then(response => {
+		res.send({
+			message: 'success',
+			status: 200
+		})
+	}).catch(err => {
+		res.send({
+			message: 'faled',
+			status: 300
+		})
+	})
 })
 const port = process.env.PORT || 3001;
 // Configuring port for APP

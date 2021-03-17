@@ -519,12 +519,13 @@ class ExportCustomReport extends React.Component {
                 fontSize: 25,
                 display: 'inline-block',
                 color: 'white',
+				fontWeight: '900',
             },
             tableRowHead: {
                 flex: 1,
                 marginLeft: '5%',
                 flexDirection: 'row',
-                marginTop: '5px'
+                marginTop: '0'
             },
             tableColLeft: {
                 borderStyle: "solid",
@@ -641,6 +642,20 @@ class ExportCustomReport extends React.Component {
                 textAlign: 'left',
                 marginRight: '15px',
                 marginTop: '6px'
+            },
+            tableColLeft21: {
+                borderBottom: 1,
+                borderBottomColor: 'grey',
+                display: 'inline-block',
+                width: '20%',
+                float: 'left',
+                flexDirection: 'column',
+                color: 'grey',
+                fontSize: 12,
+                textAlign: 'left',
+                marginRight: '15px',
+                marginTop: '6px',
+				textTransform: 'capitalize'
             },
             tableTd1: {
                 display: 'inline-block',
@@ -946,6 +961,20 @@ class ExportCustomReport extends React.Component {
                 padding: '5px'
 
             },
+            tableColLeft21: {
+                borderStyle: "solid",
+                borderWidth: 0,
+                borderLeftWidth: 0,
+                borderTopWidth: 0,
+                display: 'inline-block',
+                width: '60%',
+                float: 'left',
+                flexDirection: 'column',
+                fontSize: 12,
+                textAlign: 'left',
+                padding: '5px',
+				textTransform: 'capitalize'
+            },
             th1: {
                 'width': '30%',
             },
@@ -1137,6 +1166,26 @@ class ExportCustomReport extends React.Component {
                 color: '#4265A2',
                 padding: '10px',
                 fontWeight: 600
+
+            },
+            tableColLeft21: {
+                borderStyle: "solid",
+                borderWidth: 0,
+                borderLeftWidth: 0,
+                borderTopWidth: 0,
+                display: 'inline-block',
+                width: '47%',
+                float: 'left',
+                flexDirection: 'column',
+                fontSize: 16,
+                textAlign: 'left',
+                padding: '5px',
+                marginLeft: '4%',
+                backgroundColor: '#DAE3F3',
+                color: '#4265A2',
+                padding: '10px',
+                fontWeight: 600,				
+				textTransform: 'capitalize'
 
             },
             tablecontentLeft: {
@@ -1406,6 +1455,13 @@ class ExportCustomReport extends React.Component {
 									</View>
                                 </View>
 								<View style={styles.col12}>
+                                    <View style={styles.rowHead2subHead}>
+                                        <Text style={styles.rowHead2Text2subHead_center}>
+                                            Top 5 Ranked Maximum CSDM Value
+                                        </Text>
+                                    </View>
+                                </View>
+								<View style={styles.col12}>
 								 {this.state.metric.csdm_15 === 'on' ?
 									<View style={[stylepage3.tableRow, stylepage3.tableHead]}>
 										{/*-- Table head --*/}
@@ -1427,7 +1483,7 @@ class ExportCustomReport extends React.Component {
 													<Text style={[stylepage3.tableColLeft1]}>{index + 1}</Text>
 													<Text style={[stylepage3.tableColLeft1]}>{this.state.impact_date}</Text>
 													<Text style={[stylepage3.tableColLeft1]}>{val.toFixed(2)}</Text>
-													<Text style={[stylepage3.tableColLeft2]}>{csdm15brainstate[index] ? csdm15brainstate[index] : "NA"}</Text>
+													<Text style={[stylepage3.tableColLeft21]}>{csdm15brainstate[index] ? csdm15brainstate[index] : "NA"}</Text>
 												</View>
 											}
 										}else{
@@ -1458,6 +1514,7 @@ class ExportCustomReport extends React.Component {
                                             </Text>
                                     </View>
                                 </View>
+								
 							{ /*  <View style={styles.col12}>
                                     <View style={styles.rowHeadBorder}><Text style={styles.rowHead2Text}></Text></View>
                                     <View style={styles.rowHead2}>
@@ -1570,6 +1627,14 @@ class ExportCustomReport extends React.Component {
 										}
 									</View>
                                 </View>
+								
+								<View style={styles.col12}>
+                                    <View style={styles.rowHead2subHead}>
+                                        <Text style={styles.rowHead2Text2subHead_center}>
+                                            Top 5 Ranked Maximum Principal Strain Value
+                                        </Text>
+                                    </View>
+                                </View>
 								<View style={styles.col12}>
 								 {this.state.metric.mps_95 === 'on' ?
 									<View style={[stylepage3.tableRow, stylepage3.tableHead]}>
@@ -1592,7 +1657,7 @@ class ExportCustomReport extends React.Component {
 													<Text style={[stylepage3.tableColLeft1]}>{index + 1}</Text>
 													<Text style={[stylepage3.tableColLeft1]}>{this.state.impact_date}</Text>
 													<Text style={[stylepage3.tableColLeft1]}>{val.toFixed(2)}</Text>
-													<Text style={[stylepage3.tableColLeft2]}>
+													<Text style={[stylepage3.tableColLeft21]}>
 													{mpsbrainstate[index] ? mpsbrainstate[index] == "msc"? "Motor Sensory Cortex" : mpsbrainstate[index] : "NA"}
 													
 													</Text>
@@ -1750,6 +1815,14 @@ class ExportCustomReport extends React.Component {
 										}
 									</View>
                                 </View>
+								
+								<View style={styles.col12}>
+                                    <View style={styles.rowHead2subHead}>
+                                        <Text style={styles.rowHead2Text2subHead_center}>
+                                            Top 5 Ranked Maximum Principal Strain Value
+                                        </Text>
+                                    </View>
+                                </View>
 								<View style={styles.col12}>
 								 {this.state.metric.mps_95 === 'on' ?
 									<View style={[stylepage3.tableRow, stylepage3.tableHead]}>
@@ -1772,7 +1845,7 @@ class ExportCustomReport extends React.Component {
 													<Text style={[stylepage3.tableColLeft1]}>{index + 1}</Text>
 													<Text style={[stylepage3.tableColLeft1]}>{this.state.impact_date}</Text>
 													<Text style={[stylepage3.tableColLeft1]}>{val.toFixed(2)}</Text>
-													<Text style={[stylepage3.tableColLeft2]}>
+													<Text style={[stylepage3.tableColLeft21]}>
 													{mpsbrainstate[index] ? mpsbrainstate[index] == "msc"? "Motor Sensory Cortex" : mpsbrainstate[index] : "NA"}
 													</Text>
 												</View>

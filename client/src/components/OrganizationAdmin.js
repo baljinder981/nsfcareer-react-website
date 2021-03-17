@@ -20,7 +20,8 @@ import {
     renameOrganization,
     addOrganization,
     MergeOrganization,
-    getAllOrganizationsOfSensorBrandList
+    getAllOrganizationsOfSensorBrandList,
+	updateuseraccess,
 } from '../apis';
 import { 
     UncontrolledAlert
@@ -77,6 +78,7 @@ class OrganizationAdmin extends React.Component {
             view: 'gridView',
 			delete_id:'',
 			highlight_id: '',
+			loader: false,
 			accessPopup: false,
 			manageAccessData:'',
         };
@@ -213,8 +215,37 @@ class OrganizationAdmin extends React.Component {
 		this.setState({ highlight_id : this.state.delete_id })
         this.setState({ isDisplay:{ display: 'none' } });
     }
-	isUpdateData3 = (data) =>{
-        console.log('isUpdateData',data);
+	isUpdateData2 = (data) =>{
+		updateuseraccess(data)
+		.then(response => {
+			if(response.data.message == "success" ){
+				this.setState({manageAccessData:''});
+				this.setState({isAccessPopup: {display:'none'}});
+				this.setState({accessPopup: false});
+				this.setState({staffList: []});
+				this.setState({loader: true});
+				fetchStaffMembers({user_cognito_id : this.props.location.state.brand.user_cognito_id, brand: this.props.location.state.brand.brand})
+				.then(response => {
+					this.setState(prevState => ({
+						staffList: [...prevState.staffList, response.data.data],
+					}));
+					this.setState({loader: false});
+				})
+			}
+			if(response.data.message == "faled" ){
+				this.setState({manageAccessData:''});
+				this.setState({isAccessPopup: {display:'none'}});
+				this.setState({accessPopup: false});
+				this.setState({staffList: []});
+				fetchStaffMembers({user_cognito_id : this.props.location.state.brand.user_cognito_id, brand: this.props.location.state.brand.brand})
+				.then(response => {
+					this.setState(prevState => ({
+						staffList: [...prevState.staffList, response.data.data],
+					}));
+					this.setState({loader: false});
+				})
+			}
+		})
 	}
     isUpdateData = (data) =>{
         console.log('isUpdateData',data);
@@ -699,11 +730,10 @@ class OrganizationAdmin extends React.Component {
         var staffList =  this.state.staffList.map(function (staff, index) {
             return staff;
         })
-        // console.log('staffList',staffList);
+         console.log('staffList',staffList);
         // staffList[0].map( (staff, index) =>
         //     console.log(staff)
         //  )
-         console.log('staffList',this.state.isAccessPopup)
         return (
             <React.Fragment>
 				<ManageAccessPopup isVisible={this.state.isAccessPopup}  makeVisible3={(this.props.makeVisible3)? this.props.makeVisible3 : this.makeVisible3} data={this.state.manageAccessData} isUpdateData2={(this.props.isUpdateData2)? this.props.isUpdateData2 : this.isUpdateData2}  />
@@ -811,12 +841,27 @@ class OrganizationAdmin extends React.Component {
                                                     <tr>
                                                         <th scope="col">#</th>
                                                         <th scope="col">Name</th>
+														{This.state.userDetails.level === 1000 &&
+															<th scope="col">Super Admin</th>
+														}
+														{This.state.userDetails.level === 1000 &&
+															<th scope="col">API Access</th>
+														}
+														{This.state.userDetails.level === 1000 &&
+															<th scope="col">Simulation Portel Access</th>
+														}
                                                         <th scope="col">Email</th> 
-														{/* <th scope="col">Access Status</th> */}
+														{This.state.userDetails.level === 1000 &&
+															<th scope="col">Access Status</th>
+														}
                                                     </tr>
                                                 </thead>
                                                 <tbody className="player-table">
                                                 {/* eslint-disable-next-line*/}
+                                                {this.state.loader ?
+													 <tr><td><i class="fa fa-spinner fa-spin" style={{ 'font-size': '24px' }}></i></td></tr>
+													: null
+												}
                                                     {staffList[0] && staffList[0].map(function (staff, index) {
                                                         if(staff.data){
                                                             if(staff.data.level === 400){
@@ -824,10 +869,39 @@ class OrganizationAdmin extends React.Component {
                                                                     <td onClick={()=>{if(staff.data && level === 1000){ var win = window.open('/admin/view/user?id='+staff.data.user_cognito_id); win.focus();} }}>
 																	{staff.data ?  index + 1 : ''}</td>
                                                                     <td onClick={()=>{if(staff.data && level === 1000){ var win = window.open('/admin/view/user?id='+staff.data.user_cognito_id); win.focus();} }}>{staff.data ? staff.data.first_name : ''} {staff.data ? staff.data.last_name : ''}</td>
+																	{This.state.userDetails.level === 1000 &&
+																		<td>
+																		{staff.data.superadmin == 1 ? 
+																		<i class="fa fa-check" style={{ 'font-size': '24px','color': 'green' }}></i>
+																		:
+																		<i class="fa fa-times" style={{ 'font-size': '24px' ,'color': 'red'}}></i>
+																		}
+																		</td>
+																	}
+																	{This.state.userDetails.level === 1000 &&
+																		<td>
+																		{staff.data.apiaccess == 1 ? 
+																		<i class="fa fa-check" style={{ 'font-size': '24px' ,'color': 'green'}}></i>
+																		:
+																		<i class="fa fa-times" style={{ 'font-size': '24px' ,'color': 'red'}}></i>
+																		}
+																		</td>
+																	}
+																	{This.state.userDetails.level === 1000 &&
+																		<td>
+																		{staff.data.portelaccess == 1 ? 
+																		<i class="fa fa-check" style={{ 'font-size': '24px' ,'color': 'green'}}></i>
+																		:
+																		<i class="fa fa-times" style={{ 'font-size': '24px' ,'color': 'red'}}></i>
+																		}
+																		</td>
+																	}
                                                                     <td onClick={()=>{if(staff.data && level === 1000){ var win = window.open('/admin/view/user?id='+staff.data.user_cognito_id); win.focus();} }}>{staff.data ? staff.data.email : ''} </td>
-																	{ /* <td>
-																	   <button className="btn btn-primary" onClick={(e) => This.manageAccess({name: staff.data.first_name+' '+staff.data.last_name,cognito_id: staff.data.user_cognito_id})} >Manage Access</button>
-																		</td>*/ }
+																	 {This.state.userDetails.level === 1000 &&
+																	<td>
+																	   <button className="btn btn-primary" onClick={(e) => This.manageAccess({name: staff.data.first_name+' '+staff.data.last_name,cognito_id: staff.data.user_cognito_id,staffdata: staff.data })} >Manage Access</button>
+																		</td> 
+																	 }
                                                                 </tr>
                                                             }
                                                         }else{

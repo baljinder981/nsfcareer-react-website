@@ -3504,7 +3504,6 @@ function deleteSimulation_imagesData(image_id){
                 image_id: image_id,
             },
         };
-		console.log(params);
         docClient.delete(params, function (err, data) {
             if (err) {
                 reject(err);
@@ -3916,7 +3915,6 @@ function InsertNewSensorDataByPlayerID(obj) {
             TableName: "sensor_details",
             Item: obj,
         };
-		console.log("dbInsert",dbInsert);
         docClient.put(dbInsert, function (err, data) {
             if (err) {
                 console.log(err);
@@ -3929,6 +3927,32 @@ function InsertNewSensorDataByPlayerID(obj) {
     });
 }
 
+function updateuseraccess(data) {
+    console.log('data ',data);
+     return new Promise((resolve, reject) => {
+       var userParams = {
+            TableName: "users",
+            Key: {
+                user_cognito_id: data.data.cognito_id,
+            },
+            UpdateExpression:
+                "set superadmin = :superadmin, apiaccess = :apiaccess, portelaccess = :portelaccess",
+            ExpressionAttributeValues: {
+                ":superadmin": data.superadmin,
+                ":apiaccess": data.apiaccess,
+                ":portelaccess": data.portelaccess,
+            },
+            ReturnValues: "UPDATED_NEW",
+        };
+        docClient.update(userParams, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
 
 module.exports = {
     getUserDetails,
@@ -4047,4 +4071,5 @@ module.exports = {
 	getSensorDataByPlayerID,
 	InsertNewSensorDataByPlayerID,
 	DeleteSensorDataByPlayerID,
+	updateuseraccess,
 };

@@ -1535,3 +1535,15 @@ export const deleteEventByImageID = (request) =>{
       });
   })
 }
+//# updateuseraccess
+export const updateuseraccess = (request) =>{
+  return new Promise((resolve,reject)=>{
+      axios.post(`/updateuseraccess`, request, {withCredentials: true})
+      .then(function (response) {
+        resolve(response);
+      })
+      .catch(function (error) {
+        reject(error)
+      });
+  })
+}
