@@ -2830,7 +2830,7 @@ function emptyBucket(obj, callback) {
         Bucket: obj.bucket_name,
         Prefix: obj.root_path
     };
-console.log("params",params);
+    console.log("params", params);
     s3.listObjects(params, function (err, data) {
         if (err) return callback(err);
 
@@ -2858,7 +2858,7 @@ console.log("params",params);
 app.post(`${apiPrefix}deleteItem`, (req, res) => {
     let type = req.body.type;
     let data = req.body.data;
-                console.log('data', data)
+    console.log('data', data)
     if (type == 'team') {
 
         getBrandDataByorg(data.brand, data.organization)
@@ -3004,13 +3004,13 @@ app.post(`${apiPrefix}deleteItem`, (req, res) => {
                         })
                 }
             }).catch(err => {
-				console.log('err', err)
-				res.send({
-					message: 'failure',
-					status: 300,
-					err: err
-				})
-			})
+                console.log('err', err)
+                res.send({
+                    message: 'failure',
+                    status: 300,
+                    err: err
+                })
+            })
 
 
     } else if (type == 'orgTeam') {
@@ -3252,7 +3252,7 @@ app.post(`${apiPrefix}addorgTeam`, (req, res) => {
 });
 
 app.post(`${apiPrefix}renameTeam`, (req, res) => {
-     console.log('body',req.body);
+    console.log('body', req.body);
     let organization_id = req.body.organization_id;
     let team_name = req.body.TeamName;
     let data = req.body.data;
@@ -3263,81 +3263,81 @@ app.post(`${apiPrefix}renameTeam`, (req, res) => {
         .then(sensor_data => {
             console.log('sensor_data ', sensor_data);
             let sensor_cnt = 0;
-			if(sensor_data.length > 0){
-            sensor_data.forEach(function (record, index) {
-                const params = {
-                    TableName: "sensor_details",
-                    Key: {
-                        org_id: record.org_id,
-                        player_id: record.player_id,
-                    },
-                    UpdateExpression: "set team = :team_name",
-                    ExpressionAttributeValues: {
-                        ":team_name": team_name
-                    },
-                    ReturnValues: "UPDATED_NEW"
-                };
-                docClient.update(params, function (err, data1) {
-                    if (err) {
-                        console.log("Error when updating data\n", err);
-                    } else {
-                        console.log("Sensor updated");
-                    }
-                    sensor_cnt++;
-                    if (sensor_cnt === sensor_data.length) {
-                        getUserByTeam(data.TeamName, data.organization)
-                            .then(response => {
-                                console.log('response', response);
-                                let users_data = response;
-                                if (users_data[0]) {
-                                    let userslen = users_data.length;
-                                    userslen = userslen - 1;
-                                    users_data.forEach(function (record1, index1) {
-                                        renameUsers(record1.user_cognito_id, team_name)
-                                            .then(data => {
-                                                console.log('res', data)
-                                                if (index1 == userslen) {
-                                                    res.send({
-                                                        message: 'success',
-                                                        status: 200
-                                                    })
-                                                }
-                                            }).catch(err => {
-                                                console.log('err', err)
-                                                if (index1 == userslen) {
-                                                    res.send({
-                                                        message: 'failure',
-                                                        status: 300,
-                                                        err: err
-                                                    })
-                                                }
-                                            })
-                                    })
-                                } else {
-                                    res.send({
-                                        message: 'success',
-                                        status: 200 
-                                    })
-                                }
-                            })
-                            .catch(err => {
-                                console.log(err)
-                                res.send({
-                                    message: 'failure',
-                                    status: 300,
-                                    err: err
+            if (sensor_data.length > 0) {
+                sensor_data.forEach(function (record, index) {
+                    const params = {
+                        TableName: "sensor_details",
+                        Key: {
+                            org_id: record.org_id,
+                            player_id: record.player_id,
+                        },
+                        UpdateExpression: "set team = :team_name",
+                        ExpressionAttributeValues: {
+                            ":team_name": team_name
+                        },
+                        ReturnValues: "UPDATED_NEW"
+                    };
+                    docClient.update(params, function (err, data1) {
+                        if (err) {
+                            console.log("Error when updating data\n", err);
+                        } else {
+                            console.log("Sensor updated");
+                        }
+                        sensor_cnt++;
+                        if (sensor_cnt === sensor_data.length) {
+                            getUserByTeam(data.TeamName, data.organization)
+                                .then(response => {
+                                    console.log('response', response);
+                                    let users_data = response;
+                                    if (users_data[0]) {
+                                        let userslen = users_data.length;
+                                        userslen = userslen - 1;
+                                        users_data.forEach(function (record1, index1) {
+                                            renameUsers(record1.user_cognito_id, team_name)
+                                                .then(data => {
+                                                    console.log('res', data)
+                                                    if (index1 == userslen) {
+                                                        res.send({
+                                                            message: 'success',
+                                                            status: 200
+                                                        })
+                                                    }
+                                                }).catch(err => {
+                                                    console.log('err', err)
+                                                    if (index1 == userslen) {
+                                                        res.send({
+                                                            message: 'failure',
+                                                            status: 300,
+                                                            err: err
+                                                        })
+                                                    }
+                                                })
+                                        })
+                                    } else {
+                                        res.send({
+                                            message: 'success',
+                                            status: 200
+                                        })
+                                    }
                                 })
-                            })
-                    }
-                });
-            })
-			}else{
-				console.log('sensor_data 1', sensor_data);
-				res.send({
-					message: 'success', 
-					status: 200 
-				}) 
-			}
+                                .catch(err => {
+                                    console.log(err)
+                                    res.send({
+                                        message: 'failure',
+                                        status: 300,
+                                        err: err
+                                    })
+                                })
+                        }
+                    });
+                })
+            } else {
+                console.log('sensor_data 1', sensor_data);
+                res.send({
+                    message: 'success',
+                    status: 200
+                })
+            }
         })
 });
 
@@ -4441,18 +4441,18 @@ app.post(`${apiPrefix}getPlayerList`, (req, res) => {
                                                 // console.log('simulation',simulation.status
                                                 p_data[index]['simulation_data'][0]['simulation_status'] = simulation ? simulation.status : '';
                                                 p_data[index]['simulation_data'][0]['computed_time'] = simulation ? simulation.computed_time : '';
-												getUserDetailByPlayerId(record.simulation_data[0].player_id.split('$')[0])
-                                                .then(u_detail => {
-                                                    k++;
-                                                    // console.log('user details ', u_detail[0]['first_name'])
-                                                    p_data[index]['simulation_data'][0]['user_data'] = u_detail.length > 0 ? u_detail[0] : '';
-                                                    if (k == p_data.length) {                            
-														res.send({
-															message: "success",
-															data: p_data,
-														})
-													} 
-                                                })
+                                                getUserDetailByPlayerId(record.simulation_data[0].player_id.split('$')[0])
+                                                    .then(u_detail => {
+                                                        k++;
+                                                        // console.log('user details ', u_detail[0]['first_name'])
+                                                        p_data[index]['simulation_data'][0]['user_data'] = u_detail.length > 0 ? u_detail[0] : '';
+                                                        if (k == p_data.length) {
+                                                            res.send({
+                                                                message: "success",
+                                                                data: p_data,
+                                                            })
+                                                        }
+                                                    })
                                             })
                                             .catch(err => {
                                                 console.log(err);
@@ -4597,7 +4597,7 @@ app.post(`${apiPrefix}loadMorePlayerList`, (req, res) => {
                                                 .then(u_detail => {
 
                                                     k++;
-                                                   // console.log('user details ', u_detail[0]['account_id'])
+                                                    // console.log('user details ', u_detail[0]['account_id'])
                                                     p_data[index]['simulation_data'][0]['user_data'] = u_detail.length > 0 ? u_detail[0] : '';
                                                     if (k == p_data.length) {
                                                         let requested_players = []
@@ -4950,7 +4950,7 @@ app.post(`${apiPrefix}getAvatarInspection`, VerifyToken, (req, res) => {
             error: 'User cognito id is required '
         })
     }
-}) 
+})
 
 app.post(`${apiPrefix}getUserDetailsByAccountID`, VerifyToken, (req, res) => {
     // If request comes to get detail of specific player
@@ -4959,205 +4959,205 @@ app.post(`${apiPrefix}getUserDetailsByAccountID`, VerifyToken, (req, res) => {
         req.user_cognito_id = req.body.user_cognito_id;
     }
     getUserDbDataByAccountId(req.user_cognito_id).then(data => {
-        console.log("userData",data[0])
-            var userData = data[0];
-            if (userData) {
-                if (userData && userData.account_id) {
-                    req.user_cognito_id = userData.account_id;
-                }
-
-                getUploadedImageFileList(req.user_cognito_id, function (err, list) {
-                    if (err) {
-                        console.log(err);
-
-                    }
-                    else {
-                        // Fetches the latest profile pic
-                        var latestProfilePic = list.reduce(function (oldest, profile_pic) {
-                            return oldest.LastModified > profile_pic.LastModified ? oldest : profile_pic;
-                        }, {});
-                        // Now get the signed URL link  from S3
-                        // if no S3 link is found then send empty data link
-                        // KEY : req.user_cognito_id + "/profile/" + req.user_cognito_id ;
-                        // No file is uploaded
-                        var key
-                        if (list.length != 0) {
-                            key = latestProfilePic.Key;
-                        }
-                        else {
-                            key = req.user_cognito_id + "/profile/image/" + req.user_cognito_id;
-                        }
-
-                        getFileSignedUrl(key, function (err, url) {
-                            if (err) {
-                                console.log(err);
-                                userData["profile_picture_url"] = "";
-                                userData["avatar_url"] = "";
-                                res.send({
-                                    message: "success",
-                                    data: userData
-                                })
-                            }
-                            else {
-                                if (list.length == 0) {
-                                    userData["profile_picture_url"] = "";
-                                }
-                                else {
-                                    userData["profile_picture_url"] = url;
-                                }
-
-                                // Getting Avatar URL
-                                getUploadedModelFileList(req.user_cognito_id, function (err, list) {
-
-                                    userData["avatar_url"] = "";
-                                    if (err) {
-                                        console.log(err);
-                                        res.send({
-                                            message: "failure 6",
-                                            data: userData
-                                        })
-
-                                    }
-                                    else {
-
-
-                                        // Fetches the latest profile pic
-                                        var latestModel = list.reduce(function (oldest, latest_model) {
-                                            return oldest.LastModified > latest_model.LastModified ? oldest : latest_model;
-                                        }, {});
-                                        // Now get the signed URL link  from S3
-                                        // if no S3 link is found then send empty data link
-                                        // KEY : req.user_cognito_id + "/profile/" + req.user_cognito_id ;
-                                        // No file is uploaded
-                                        var model_key
-                                        if (list.length != 0) {
-                                            model_key = latestModel.Key;
-                                        }
-                                        else {
-                                            model_key = req.user_cognito_id + "/profile/model/" + req.user_cognito_id;
-                                        }
-
-
-
-                                        getFileSignedUrl(model_key, function (err, url) {
-                                            if (err) {
-                                                console.log(err);
-                                                userData["avatar_url"] = "";
-                                                res.send({
-                                                    message: "failure 5",
-                                                    data: userData
-                                                })
-                                            }
-                                            else {
-                                                if (list.length == 0) {
-                                                    userData["avatar_url"] = "";
-                                                }
-                                                else {
-                                                    userData["avatar_url"] = url;
-                                                }
-                                                // fetch inf url also here
-                                                getINPFile(req.user_cognito_id).then((url) => {
-                                                    userData["inp_file_url"] = url;
-
-                                                    getVtkFileLink(req.user_cognito_id)
-                                                        .then(url => {
-                                                            userData["vtk_file_url"] = url;
-
-                                                            getSimulationFile(req.user_cognito_id, function (err, list) {
-                                                                userData["simulation_file_url"] = "";
-                                                                if (err) {
-                                                                    console.log(err);
-                                                                    res.send({
-                                                                        message: "failure 4",
-                                                                        data: userData
-                                                                    })
-
-                                                                }
-                                                                else {
-
-                                                                    // Fetches the latest profile pic
-                                                                    var latestModel = list.reduce(function (oldest, latest_model) {
-                                                                        return oldest.LastModified > latest_model.LastModified ? oldest : latest_model;
-                                                                    }, {});
-                                                                    // Now get the signed URL link  from S3
-                                                                    // if no S3 link is found then send empty data link
-                                                                    // KEY : req.user_cognito_id + "/profile/" + req.user_cognito_id ;
-                                                                    // No file is uploaded
-                                                                    var model_key
-                                                                    if (list.length != 0) {
-                                                                        model_key = latestModel.Key;
-                                                                    }
-                                                                    else {
-                                                                        model_key = req.user_cognito_id + "/profile/simulation/" + req.user_cognito_id;
-                                                                    }
-                                                                    getFileSignedUrl(model_key, function (err, url) {
-                                                                        if (err) {
-                                                                            console.log(err);
-                                                                            userData["simulation_file_url"] = "";
-                                                                            res.send({
-                                                                                message: "failure 3",
-                                                                                data: userData
-                                                                            })
-                                                                        }
-                                                                        else {
-                                                                            if (list.length == 0) {
-                                                                                userData["simulation_file_url"] = "";
-                                                                            }
-                                                                            else {
-                                                                                userData["simulation_file_url"] = url;
-                                                                            }
-                                                                            res.send({
-                                                                                message: "success",
-                                                                                data: userData
-                                                                            })
-
-                                                                        }
-                                                                    })
-                                                                }
-                                                            })
-
-
-                                                        })
-                                                        .catch(err => {
-                                                            res.send({
-                                                                message: "failure 2",
-                                                                error: err
-                                                            })
-                                                        })
-
-
-                                                })
-                                                    .catch((err) => {
-                                                        res.send({
-                                                            message: "failure 1"
-                                                        })
-                                                    })
-                                            }
-
-                                        }, 'avatar')
-
-                                    }
-
-                                })
-                            }
-                        });
-                    }
-                })
-            } else {
-                res.send({
-                    message: "failure",
-                    data: {}
-                })
+        console.log("userData", data[0])
+        var userData = data[0];
+        if (userData) {
+            if (userData && userData.account_id) {
+                req.user_cognito_id = userData.account_id;
             }
 
-        
+            getUploadedImageFileList(req.user_cognito_id, function (err, list) {
+                if (err) {
+                    console.log(err);
+
+                }
+                else {
+                    // Fetches the latest profile pic
+                    var latestProfilePic = list.reduce(function (oldest, profile_pic) {
+                        return oldest.LastModified > profile_pic.LastModified ? oldest : profile_pic;
+                    }, {});
+                    // Now get the signed URL link  from S3
+                    // if no S3 link is found then send empty data link
+                    // KEY : req.user_cognito_id + "/profile/" + req.user_cognito_id ;
+                    // No file is uploaded
+                    var key
+                    if (list.length != 0) {
+                        key = latestProfilePic.Key;
+                    }
+                    else {
+                        key = req.user_cognito_id + "/profile/image/" + req.user_cognito_id;
+                    }
+
+                    getFileSignedUrl(key, function (err, url) {
+                        if (err) {
+                            console.log(err);
+                            userData["profile_picture_url"] = "";
+                            userData["avatar_url"] = "";
+                            res.send({
+                                message: "success",
+                                data: userData
+                            })
+                        }
+                        else {
+                            if (list.length == 0) {
+                                userData["profile_picture_url"] = "";
+                            }
+                            else {
+                                userData["profile_picture_url"] = url;
+                            }
+
+                            // Getting Avatar URL
+                            getUploadedModelFileList(req.user_cognito_id, function (err, list) {
+
+                                userData["avatar_url"] = "";
+                                if (err) {
+                                    console.log(err);
+                                    res.send({
+                                        message: "failure 6",
+                                        data: userData
+                                    })
+
+                                }
+                                else {
+
+
+                                    // Fetches the latest profile pic
+                                    var latestModel = list.reduce(function (oldest, latest_model) {
+                                        return oldest.LastModified > latest_model.LastModified ? oldest : latest_model;
+                                    }, {});
+                                    // Now get the signed URL link  from S3
+                                    // if no S3 link is found then send empty data link
+                                    // KEY : req.user_cognito_id + "/profile/" + req.user_cognito_id ;
+                                    // No file is uploaded
+                                    var model_key
+                                    if (list.length != 0) {
+                                        model_key = latestModel.Key;
+                                    }
+                                    else {
+                                        model_key = req.user_cognito_id + "/profile/model/" + req.user_cognito_id;
+                                    }
+
+
+
+                                    getFileSignedUrl(model_key, function (err, url) {
+                                        if (err) {
+                                            console.log(err);
+                                            userData["avatar_url"] = "";
+                                            res.send({
+                                                message: "failure 5",
+                                                data: userData
+                                            })
+                                        }
+                                        else {
+                                            if (list.length == 0) {
+                                                userData["avatar_url"] = "";
+                                            }
+                                            else {
+                                                userData["avatar_url"] = url;
+                                            }
+                                            // fetch inf url also here
+                                            getINPFile(req.user_cognito_id).then((url) => {
+                                                userData["inp_file_url"] = url;
+
+                                                getVtkFileLink(req.user_cognito_id)
+                                                    .then(url => {
+                                                        userData["vtk_file_url"] = url;
+
+                                                        getSimulationFile(req.user_cognito_id, function (err, list) {
+                                                            userData["simulation_file_url"] = "";
+                                                            if (err) {
+                                                                console.log(err);
+                                                                res.send({
+                                                                    message: "failure 4",
+                                                                    data: userData
+                                                                })
+
+                                                            }
+                                                            else {
+
+                                                                // Fetches the latest profile pic
+                                                                var latestModel = list.reduce(function (oldest, latest_model) {
+                                                                    return oldest.LastModified > latest_model.LastModified ? oldest : latest_model;
+                                                                }, {});
+                                                                // Now get the signed URL link  from S3
+                                                                // if no S3 link is found then send empty data link
+                                                                // KEY : req.user_cognito_id + "/profile/" + req.user_cognito_id ;
+                                                                // No file is uploaded
+                                                                var model_key
+                                                                if (list.length != 0) {
+                                                                    model_key = latestModel.Key;
+                                                                }
+                                                                else {
+                                                                    model_key = req.user_cognito_id + "/profile/simulation/" + req.user_cognito_id;
+                                                                }
+                                                                getFileSignedUrl(model_key, function (err, url) {
+                                                                    if (err) {
+                                                                        console.log(err);
+                                                                        userData["simulation_file_url"] = "";
+                                                                        res.send({
+                                                                            message: "failure 3",
+                                                                            data: userData
+                                                                        })
+                                                                    }
+                                                                    else {
+                                                                        if (list.length == 0) {
+                                                                            userData["simulation_file_url"] = "";
+                                                                        }
+                                                                        else {
+                                                                            userData["simulation_file_url"] = url;
+                                                                        }
+                                                                        res.send({
+                                                                            message: "success",
+                                                                            data: userData
+                                                                        })
+
+                                                                    }
+                                                                })
+                                                            }
+                                                        })
+
+
+                                                    })
+                                                    .catch(err => {
+                                                        res.send({
+                                                            message: "failure 2",
+                                                            error: err
+                                                        })
+                                                    })
+
+
+                                            })
+                                                .catch((err) => {
+                                                    res.send({
+                                                        message: "failure 1"
+                                                    })
+                                                })
+                                        }
+
+                                    }, 'avatar')
+
+                                }
+
+                            })
+                        }
+                    });
+                }
+            })
+        } else {
+            res.send({
+                message: "failure",
+                data: {}
+            })
+        }
+
+
     }).catch(err => {
-			res.send({
-				message: "failure 7",
-				error: err,
-				data: []
-			})
-		})
+        res.send({
+            message: "failure 7",
+            error: err,
+            data: []
+        })
+    })
 });
 app.post(`${apiPrefix}getUserDetails`, VerifyToken, (req, res) => {
     // If request comes to get detail of specific player
@@ -5995,30 +5995,30 @@ app.post(`${apiPrefix}resetToOriginal`, (req, res) => {
 });
 var videoStorage = multer.memoryStorage('public/uploads/');
 var uploadSidelineWmvVideo = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, 'public/uploads/');
     },
 
     // By default, multer removes file extensions so let's add them back
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
     }
 });
-function changeWmvVideoToMp4(file){
-    console.log('file ------------ changing ',file);
-    return new Promise((resolve, reject)=>{
+function changeWmvVideoToMp4(file) {
+    console.log('file ------------ changing ', file);
+    return new Promise((resolve, reject) => {
         var outputFilePath = `public/uploads/${Date.now()}_mp4.mp4`
         exec(`ffmpeg -i public/uploads/${file} -c:v libx264 -crf 23 -c:a aac -q:a 100  ${outputFilePath}`, async (error, stdout, stderr) => {
-            if(error){
+            if (error) {
                 resolve(false);
-            }else{
+            } else {
                 console.log('finihed change')
                 fs.unlinkSync(`public/uploads/${file}`);
                 resolve(outputFilePath);
             }
         })
     })
-    
+
 }
 
 // Uploading the Sensor Data (CSV) file
@@ -6052,20 +6052,20 @@ app.post(`${apiPrefix}uploadSidelineImpactVideo`, VerifyToken, setConnectionTime
             }
 
             // File Extensions
-            console.log('uploading --------',data)
+            console.log('uploading --------', data)
             var file_extension = req.file.originalname.split(".");
             file_extension = file_extension[file_extension.length - 1];
             var newfile = ''
-            if(file_extension == 'wmv'){
+            if (file_extension == 'wmv') {
                 file_extension = 'mp4';
                 newfile = await changeWmvVideoToMp4(req.file.filename);
-                console.log('newfile ---------',newfile)
+                console.log('newfile ---------', newfile)
                 var videobuffer = fs.readFileSync(`${newfile}`);
-            }else{
+            } else {
                 var videobuffer = fs.readFileSync(`public/uploads/${req.file.filename}`)
 
             }
-            
+
             var d = new Date();
             // console.log(d.toLocaleDateString('pt-PT'));
             d = d.toLocaleDateString('pt-PT');
@@ -6073,7 +6073,7 @@ app.post(`${apiPrefix}uploadSidelineImpactVideo`, VerifyToken, setConnectionTime
             date = date.replace("/", "-");
             console.log('date', date);
             // Setting Attributes for file upload on S3
-            uploadParams.Key = data['account_id'] + "/simulation/" + image_id + "_SidelineVideo/"+ file_name + "." + file_extension;
+            uploadParams.Key = data['account_id'] + "/simulation/" + image_id + "_SidelineVideo/" + file_name + "." + file_extension;
             // console.log('req.file.buffer', req.file.buffer)
             uploadParams.Body = videobuffer;
 
@@ -6088,7 +6088,7 @@ app.post(`${apiPrefix}uploadSidelineImpactVideo`, VerifyToken, setConnectionTime
 
                 } else {
                     console.log('data', uploadParams.Key)
-                    if(newfile) fs.unlinkSync(newfile)
+                    if (newfile) fs.unlinkSync(newfile)
                     InsertImpactVideoKey(req.body.image_id, uploadParams.Key).
                         then(sensor_data => {
                             const image_id = req.body.image_id;
@@ -6101,12 +6101,12 @@ app.post(`${apiPrefix}uploadSidelineImpactVideo`, VerifyToken, setConnectionTime
                                     return verifyImageToken(imageData['token'], image_data);
                                 })
                                 .then(decoded_token => {
-                                    console.log('decoded_token',decoded_token)
+                                    console.log('decoded_token', decoded_token)
                                     return getPlayerCgValues(imageData.account_id);
                                 })
                                 .then(cg_coordinates => {
                                     // Setting cg values
-                                    console.log("cg_coordinates",cg_coordinates)
+                                    console.log("cg_coordinates", cg_coordinates)
                                     if (cg_coordinates) {
                                         imageData["cg_coordinates"] = cg_coordinates;
                                     }
@@ -6429,16 +6429,16 @@ function getVideoResolution(file_path) {
                 resolve(false);
             } else {
                 let output = stderr;
-                if(output){
+                if (output) {
                     output = output.split('Stream');
                     var reso = output[1].split(",");
                     reso = reso[2];
                     var newRes = reso.split("[");
                     newRes = newRes[0];
                     newRes = newRes.trim();
-                    console.log('getVideoResolution output -------------\n',newRes);
+                    console.log('getVideoResolution output -------------\n', newRes);
                     resolve(newRes);
-                }else{
+                } else {
                     resolve(false);
                 }
             }
@@ -6669,7 +6669,7 @@ app.post(`${apiPrefix}trimVideo`, (req, res) => {
                     var time = outputDuration.split(',')[0];
                     time = time.slice(2);
                     time = time.trim();
-                    console.log( 'stderr ----------------------', time)
+                    console.log('stderr ----------------------', time)
 
 
                     let hr = time.split(':')[0];
@@ -6696,7 +6696,7 @@ app.post(`${apiPrefix}trimVideo`, (req, res) => {
                             // let videofps = stdout.split("kb/s,")[1];
                             videofps = videofps.split('fps,')[0];
                             videofps = videofps.trim();
-                            console.log('fps rate stderr ----------------',videofps);
+                            console.log('fps rate stderr ----------------', videofps);
                             fps_of_simulation_video = parseInt(videofps);
                             console.log('fps -----------------------\n', fps_of_simulation_video);
 
@@ -6752,7 +6752,7 @@ app.post(`${apiPrefix}trimVideo`, (req, res) => {
                                                 date = date.replace("/", "-");
                                                 console.log('date', date);
                                                 // Setting Attributes for file upload on S3
-                                                uploadParams.Key = data['player_name'] + "/simulation/" + image_id + "/SidelineVideo/"+ file_name;
+                                                uploadParams.Key = data['player_name'] + "/simulation/" + image_id + "/SidelineVideo/" + file_name;
                                                 // console.log('req.file.buffer', req.file.buffer)
                                                 uploadParams.Body = buf;
 
@@ -6881,9 +6881,9 @@ app.post(`${apiPrefix}api/v1/flipVideo`, (req, res) => {
 
     //uploading files.             
     var name = Date.now();
-	console.log("trim_video_path",req.body.trim_video_path)
-	console.log("impact_video_url",req.body.impact_video_url)
-    var video_path  = req.body.trim_video_path?req.body.trim_video_path:req.body.impact_video_url;
+    console.log("trim_video_path", req.body.trim_video_path)
+    console.log("impact_video_url", req.body.impact_video_url)
+    var video_path = req.body.trim_video_path ? req.body.trim_video_path : req.body.impact_video_url;
     var file_store_path = 'public/uploads/' + name + '_movie.mp4';
     list.push(`public/uploads/${name}_movie.mp4`);
     https.get(video_path, function (response, error) {
@@ -6897,7 +6897,7 @@ app.post(`${apiPrefix}api/v1/flipVideo`, (req, res) => {
         });
 
     });
- 
+
     const writeTextfile = (list) => {
         console.log('list', list);
         exec(`ffmpeg -i ${list[0]}  -vf hflip -c:a copy  ${outputFilePath}`, (error, stdout, stderr) => {
@@ -6952,7 +6952,7 @@ app.post(`${apiPrefix}api/v1/flipVideo`, (req, res) => {
                             date = date.replace("/", "-");
                             console.log('date', date);
                             // Setting Attributes for file upload on S3
-                            uploadParams.Key = data['player_name'] + "/simulation/" + image_id + "/SidelineVideo/"  + file_name;
+                            uploadParams.Key = data['player_name'] + "/simulation/" + image_id + "/SidelineVideo/" + file_name;
                             // console.log('req.file.buffer', req.file.buffer)
                             uploadParams.Body = buf;
 
@@ -7241,10 +7241,10 @@ app.post(`${apiPrefix}getCompleteSimulationList`, (req, res) => {
 })
 
 app.post(`${apiPrefix}getCumulativeAccelerationData`, (req, res) => {
-    console.log('getCumulativeAccelerationData ----------\n',req.body);
+    console.log('getCumulativeAccelerationData ----------\n', req.body);
     getCumulativeAccelerationData(req.body)
         .then(data => {
-			console.log("getCumulativeAccelerationData",data); 
+            console.log("getCumulativeAccelerationData", data);
             res.send({
                 message: "success",
                 data: data[0],
@@ -7642,7 +7642,7 @@ app.post(`${apiPrefix}AllCumulativeAccelerationTimeRecords`, (req, res) => {
                                     //-- For CSDM-15--
                                     if (summary_data['CSDM-15']) {
                                         CSDM_15['value'] = CSDM_15['value'] || [];
-										 CSDM_15['brain-region'] = CSDM_15['brain-region'] || [];
+                                        CSDM_15['brain-region'] = CSDM_15['brain-region'] || [];
                                         CSDM_15['value'].push(summary_data['CSDM-15'].value);
                                         if (summary_data['CSDM-15']['stem']) {
                                             let newCordinates = summary_data['CSDM-15']['stem'].map(function (data, index) {
@@ -7650,7 +7650,7 @@ app.post(`${apiPrefix}AllCumulativeAccelerationTimeRecords`, (req, res) => {
                                             })
                                             newCordinates.forEach(function (summary_data, index) {
                                                 var region = 'stem';
-												CSDM_15['brain-region'].push(region);
+                                                CSDM_15['brain-region'].push(region);
                                                 CSDM_15[region] = CSDM_15[region] || [];
                                                 CSDM_15[region].push(summary_data);
                                             })
@@ -7661,7 +7661,7 @@ app.post(`${apiPrefix}AllCumulativeAccelerationTimeRecords`, (req, res) => {
                                             })
                                             newCordinates.forEach(function (summary_data, index) {
                                                 var region = 'frontal';
-												CSDM_15['brain-region'].push(region);
+                                                CSDM_15['brain-region'].push(region);
                                                 CSDM_15[region] = CSDM_15[region] || [];
                                                 CSDM_15[region].push(summary_data);
                                             })
@@ -7672,7 +7672,7 @@ app.post(`${apiPrefix}AllCumulativeAccelerationTimeRecords`, (req, res) => {
                                             })
                                             newCordinates.forEach(function (summary_data, index) {
                                                 var region = 'parietal';
-												CSDM_15['brain-region'].push(region);
+                                                CSDM_15['brain-region'].push(region);
                                                 CSDM_15[region] = CSDM_15[region] || [];
                                                 CSDM_15[region].push(summary_data);
                                             })
@@ -7683,7 +7683,7 @@ app.post(`${apiPrefix}AllCumulativeAccelerationTimeRecords`, (req, res) => {
                                             })
                                             newCordinates.forEach(function (summary_data, index) {
                                                 var region = 'msc';
-												CSDM_15['brain-region'].push(region);
+                                                CSDM_15['brain-region'].push(region);
                                                 CSDM_15[region] = CSDM_15[region] || [];
                                                 CSDM_15[region].push(summary_data);
                                             })
@@ -7694,7 +7694,7 @@ app.post(`${apiPrefix}AllCumulativeAccelerationTimeRecords`, (req, res) => {
                                             })
                                             newCordinates.forEach(function (summary_data, index) {
                                                 var region = 'cerebellum';
-												CSDM_15['brain-region'].push(region);
+                                                CSDM_15['brain-region'].push(region);
                                                 CSDM_15[region] = CSDM_15[region] || [];
                                                 CSDM_15[region].push(summary_data);
                                             })
@@ -7705,7 +7705,7 @@ app.post(`${apiPrefix}AllCumulativeAccelerationTimeRecords`, (req, res) => {
                                             })
                                             newCordinates.forEach(function (summary_data, index) {
                                                 var region = 'occipital';
-												CSDM_15['brain-region'].push(region);
+                                                CSDM_15['brain-region'].push(region);
                                                 CSDM_15[region] = CSDM_15[region] || [];
                                                 CSDM_15[region].push(summary_data);
                                             })
@@ -7716,7 +7716,7 @@ app.post(`${apiPrefix}AllCumulativeAccelerationTimeRecords`, (req, res) => {
                                             })
                                             newCordinates.forEach(function (summary_data, index) {
                                                 var region = 'temporal';
-												CSDM_15['brain-region'].push(region);
+                                                CSDM_15['brain-region'].push(region);
                                                 CSDM_15[region] = CSDM_15[region] || [];
                                                 CSDM_15[region].push(summary_data);
                                             })
@@ -7991,7 +7991,7 @@ app.post(`${apiPrefix}AllCumulativeAccelerationTimeRecords`, (req, res) => {
                         cnt++;
                     })
                     .catch(err => {
-                        console.log('err ------------------- 1',err)
+                        console.log('err ------------------- 1', err)
                         let brainRegions = {};
                         brainRegions['principal-max-strain'] = {};
                         brainRegions['principal-min-strain'] = {};
@@ -8022,8 +8022,8 @@ app.post(`${apiPrefix}AllCumulativeAccelerationTimeRecords`, (req, res) => {
 
         })
         .catch(err => {
-            console.log('err ------------------- 2',err)
-            
+            console.log('err ------------------- 2', err)
+
             let brainRegions = {};
             brainRegions['principal-max-strain'] = {};
             brainRegions['principal-min-strain'] = {};
@@ -8508,7 +8508,7 @@ app.post(`${apiPrefix}getCumulativeAccelerationTimeRecords`, (req, res) => {
                     })
                     .then(mps_dat_output => {
                         let msp_dat_data = [];
-                        if (mps_dat_output) { 
+                        if (mps_dat_output) {
                             // var mps_dat_output_data = JSON.parse(mps_dat_output.Body.toString('base64'));
                             var enc = new TextDecoder("utf-8");
                             var arr = new Uint8Array(mps_dat_output.Body);
@@ -8824,7 +8824,7 @@ app.post(`${apiPrefix}getPlayersData`, (req, res) => {
             let player_list = [];
             let requested_player_list = [];
             data.forEach(function (u) {
-                console.log('------------------u ',u.player_list)
+                console.log('------------------u ', u.player_list)
                 if (u.player_list) {
                     if (req.body.brand && u.sensor === req.body.brand) {
                         player_list = player_list.concat(u.player_list);
@@ -8838,7 +8838,7 @@ app.post(`${apiPrefix}getPlayersData`, (req, res) => {
                     requested_player_list = requested_player_list.concat(u.requested_player_list);
                 }
             })
-            
+
             // console.log('requested_player_list', requested_player_list);
             // let player_list = data[0].player_list ? data[0].player_list : [];
             if (player_list.length == 0) {
@@ -8882,7 +8882,7 @@ app.post(`${apiPrefix}getPlayersData`, (req, res) => {
                         let i = index;
                         let playerData = '';
                         getTeamDataWithPlayerRecords_2({ player_id: p, team: req.body.team_name, sensor: req.body.brand, organization: req.body.organization })
-                            .then(player_data => { 
+                            .then(player_data => {
 
                                 playerData = player_data;
                                 console.log('playerData -------------------\n', playerData)
@@ -8899,7 +8899,7 @@ app.post(`${apiPrefix}getPlayersData`, (req, res) => {
                                     p_data.push({
                                         date_time: playerData[0].player_id.split('$')[1],
                                         simulation_data: playerData,
-                                        used_sensor:  playerData[0].used_sensor &&  playerData[0].used_sensor != undefined ?  playerData[0].used_sensor : ''
+                                        used_sensor: playerData[0].used_sensor && playerData[0].used_sensor != undefined ? playerData[0].used_sensor : ''
                                     });
                                 }
                                 // console.log('p_data length', player_listLen, counter)
@@ -8923,10 +8923,10 @@ app.post(`${apiPrefix}getPlayersData`, (req, res) => {
                                                     p_data[index]['simulation_data'][0]['image_id_2'] = simulation ? simulation.image_id : '';
 
                                                     p_data[index]['simulation_data'][0]['computed_time'] = simulation ? simulation.computed_time : '';
-                                                    if(record.used_sensor){
+                                                    if (record.used_sensor) {
                                                         console.log('record.used_sensor) ---------------- ', record.used_sensor)
-                                                        var player_id = record.simulation_data[0].player_id.split('$')[0]+'-'+record.used_sensor;
-                                                    }else{
+                                                        var player_id = record.simulation_data[0].player_id.split('$')[0] + '-' + record.used_sensor;
+                                                    } else {
                                                         var player_id = record.simulation_data[0].player_id.split('$')[0];
                                                     }
                                                     getUserDetailByPlayerId(player_id)
@@ -9908,7 +9908,7 @@ app.post(`${apiPrefix}api/upload/sensor`, upload.fields([{ name: "filename", max
         })
 })
 
-app.post(`${apiPrefix}api/v1/images/SummaryBrainImages/`,upload.fields([]) ,(req, res) => {
+app.post(`${apiPrefix}api/v1/images/SummaryBrainImages/`, upload.fields([]), (req, res) => {
     // console.log('req ---------------\n',req.body);
     if (!req.body.account_id) {
         res.send('Url must contains account Id.')
@@ -9973,7 +9973,7 @@ app.post(`${apiPrefix}api/v1/images/SummaryBrainImages/`,upload.fields([]) ,(req
                                                     maximum_PSxSR: maximum_PSxSR ? `${maximum_PSxSR}` : 'Image not found',
                                                     principal_min_strain: principal_min_strain ? `${principal_min_strain}` : 'Image not found'
                                                 };
-                                                
+
                                                 var json = JSON.stringify(data); // so let's encode it
 
                                                 var filename = 'result.json'; // or whatever
@@ -9989,7 +9989,7 @@ app.post(`${apiPrefix}api/v1/images/SummaryBrainImages/`,upload.fields([]) ,(req
                                                 // res.header('content-type', 'application/pdf');
 
                                                 const download = Buffer.from(json);
-                                                console.log('download ------------\n',download)
+                                                console.log('download ------------\n', download)
                                                 res.end(download);
                                                 // res.send({
                                                 //     status: 200,
@@ -10021,11 +10021,11 @@ app.post(`${apiPrefix}api/v1/images/SummaryBrainImages/`,upload.fields([]) ,(req
     }
 })
 
-app.post(`${apiPrefix}api/v1/images/BrainImages/`,upload.fields([]) ,(req, res) => {
+app.post(`${apiPrefix}api/v1/images/BrainImages/`, upload.fields([]), (req, res) => {
     // console.log('req ---------------\n',req.body);
     if (!req.body.account_id) {
         res.send('Url must contains account Id.');
-    }else if(!req.body.event_id){
+    } else if (!req.body.event_id) {
         res.send('Url must contains event Id.');
     } else {
         const { account_id, event_id } = req.body;
@@ -10088,13 +10088,13 @@ app.post(`${apiPrefix}api/v1/images/BrainImages/`,upload.fields([]) ,(req, res) 
                                                     maximum_PSxSR: maximum_PSxSR ? `${maximum_PSxSR}` : 'Image not found',
                                                     principal_min_strain: principal_min_strain ? `${principal_min_strain}` : 'Image not found'
                                                 };
-                                                
+
                                                 var json = JSON.stringify(data); // so let's encode it
 
                                                 var filename = 'result.json'; // or whatever
                                                 var mimetype = 'application/json';
                                                 console.log('all executed')
-                                               
+
                                                 res.writeHead(200, {
                                                     'Content-Type': 'application/json',
                                                     'Content-Disposition': 'attachment; filename="filename.pdf"'
@@ -10125,8 +10125,8 @@ app.post(`${apiPrefix}api/v1/images/BrainImages/`,upload.fields([]) ,(req, res) 
     }
 })
 
-function getLabelBrainImageLink(account_id,image_id,file){
-	var fielPath = `${account_id}/simulation/${image_id}/labeledBrainImages/${file}`
+function getLabelBrainImageLink(account_id, image_id, file) {
+    var fielPath = `${account_id}/simulation/${image_id}/labeledBrainImages/${file}`
     console.log('fielPath ---------', fielPath)
     return new Promise((resolve, reject) => {
         if (fielPath) {
@@ -10137,17 +10137,17 @@ function getLabelBrainImageLink(account_id,image_id,file){
             };
             s3.getSignedUrl('getObject', params, function (err, url) {
                 if (err) {
-				console.log("err1",err);
+                    console.log("err1", err);
                     reject('');
                 } else {
                     getFileFromS3(fielPath)
                         .then(res => {
                             console.log(file, res);
                             if (res != null) {
-								console.log("url",url);
+                                console.log("url", url);
                                 resolve(url);
                             } else {
-								console.log("err2",err);
+                                console.log("err2", err);
                                 resolve('');
                             }
                         })
@@ -10160,11 +10160,11 @@ function getLabelBrainImageLink(account_id,image_id,file){
     })
 }
 
-app.post(`${apiPrefix}api/v1/images/labeledBrainImages/`,upload.fields([]) ,(req, res) => {
+app.post(`${apiPrefix}api/v1/images/labeledBrainImages/`, upload.fields([]), (req, res) => {
     // console.log('req ---------------\n',req.body);
     if (!req.body.account_id) {
         res.send('Url must contains account Id.');
-    }else if(!req.body.event_id){
+    } else if (!req.body.event_id) {
         res.send('Url must contains event Id.');
     } else {
         const { account_id, event_id } = req.body;
@@ -10227,13 +10227,13 @@ app.post(`${apiPrefix}api/v1/images/labeledBrainImages/`,upload.fields([]) ,(req
                                                     maximum_PSxSR: maximum_PSxSR ? `${maximum_PSxSR}` : 'Image not found',
                                                     principal_min_strain: principal_min_strain ? `${principal_min_strain}` : 'Image not found'
                                                 };
-                                                
+
                                                 var json = JSON.stringify(data); // so let's encode it
 
                                                 var filename = 'result.json'; // or whatever
                                                 var mimetype = 'application/json';
                                                 console.log('all executed')
-                                               
+
                                                 res.writeHead(200, {
                                                     'Content-Type': 'application/json',
                                                     'Content-Disposition': 'attachment; filename="filename.pdf"'
@@ -10540,7 +10540,7 @@ app.post(`${apiPrefix}getAllSensorBrands`, (req, res) => {
                                     res.send({
                                         message: "success",
                                         data: brandList
-                                    }) 
+                                    })
                                 }
                             }
                         })
@@ -10727,7 +10727,7 @@ app.post(`${apiPrefix}getAllOrganizationsSimultionCount`, (req, res) => {
 })
 
 app.post(`${apiPrefix}getAllteamsOfOrganizationOfSensorBrandList`, (req, res) => {
-	console.log("req.body",req.body);
+    console.log("req.body", req.body);
     getAllTeamsOfOrganizationsOfSensorBrand(req.body)
         .then(list => {
             let uniqueList = [];
@@ -10835,7 +10835,7 @@ app.post(`${apiPrefix}getAllteamsOfOrganizationOfSensorBrand`, (req, res) => {
                 })
             }
         })
-}) 
+})
 
 app.post(`${apiPrefix}getTeamSimultionCount`, (req, res) => {
     getOrganizationTeamData({ sensor: req.body.sensor, organization: req.body.organization, team: req.body.team })
@@ -10854,10 +10854,10 @@ app.post(`${apiPrefix}getTeamSimultionCount`, (req, res) => {
             });
 
 
-		console.log("simulation_records.",simulation_records);  
+            console.log("simulation_records.", simulation_records);
             getPlayerSimulationStatus(simulation_records[0].image_id)
                 .then(simulation => {
-					 
+
                     var simulation_status = simulation ? simulation.status : '';
                     var computed_time = simulation ? simulation.computed_time : '';
                     var simulation_timestamp = simulation_records[0].player_id.split('$')[1];
@@ -10998,7 +10998,7 @@ app.post(`${apiPrefix}getTeamSpheres`, (req, res) => {
                                             player_status = player_status != undefined && player_status != null ? player_status : 'approved';
 
                                             //   console.log('userData 1',userData)
-                                            console.log('player_status =====',player_status, userData[0])
+                                            console.log('player_status =====', player_status, userData[0])
                                             if (userData[0] && player_status == 'approved') {
                                                 // player position ...
                                                 if (userData[0].player_position)
@@ -11007,7 +11007,7 @@ app.post(`${apiPrefix}getTeamSpheres`, (req, res) => {
                                                 if (userData[0].sport && userData[0].sport != null)
                                                     PLAYERS_SPORT.push(userData[0].sport);
 
-                                                console.log('acc_data.image_id ------------\n',acc_data.image_id)
+                                                console.log('acc_data.image_id ------------\n', acc_data.image_id)
                                                 getPlayerSimulationStatus(acc_data.image_id)
                                                     .then(imageData => {
                                                         if (imageData && imageData.account_id && imageData.account_id != 'null') {
@@ -14468,7 +14468,7 @@ app.post(`${apiPrefix}getUserDataByPlayerID`, VerifyToken, (req, res) => {
     getFileFromS3(account_id + '/simulation/SummaryBrainImages/CSDM-15.png', '')
         .then(fileData => {
             if (fileData) {
-                var CSDM15Data = "data:image/png;base64,"+fileData.Body.toString('base64');
+                var CSDM15Data = "data:image/png;base64," + fileData.Body.toString('base64');
             } else {
                 CSDM15Data = "";
 
@@ -14479,7 +14479,7 @@ app.post(`${apiPrefix}getUserDataByPlayerID`, VerifyToken, (req, res) => {
             getFileFromS3(account_id + '/simulation/SummaryBrainImages/principal-max-strain.png', '')
                 .then(file1Data => {
                     if (file1Data) {
-                        var PMSData = "data:image/png;base64,"+file1Data.Body.toString('base64');
+                        var PMSData = "data:image/png;base64," + file1Data.Body.toString('base64');
                     } else {
                         PMSData = "";
 
@@ -14503,8 +14503,8 @@ app.post(`${apiPrefix}getUserDataByPlayerID`, VerifyToken, (req, res) => {
 
 });
 
-function getBrainImageLink(account_id,image_id,file){
-	var fielPath = `${account_id}/simulation/${image_id}/BrainImages/${file}`
+function getBrainImageLink(account_id, image_id, file) {
+    var fielPath = `${account_id}/simulation/${image_id}/BrainImages/${file}`
     console.log('fielPath ---------', fielPath)
     return new Promise((resolve, reject) => {
         if (fielPath) {
@@ -14515,17 +14515,17 @@ function getBrainImageLink(account_id,image_id,file){
             };
             s3.getSignedUrl('getObject', params, function (err, url) {
                 if (err) {
-				console.log("err1",err);
+                    console.log("err1", err);
                     reject('');
                 } else {
                     getFileFromS3(fielPath)
                         .then(res => {
                             console.log(file, res);
                             if (res != null) {
-								console.log("url",url);
+                                console.log("url", url);
                                 resolve(url);
                             } else {
-								console.log("err2",err);
+                                console.log("err2", err);
                                 resolve('');
                             }
                         })
@@ -14539,90 +14539,92 @@ function getBrainImageLink(account_id,image_id,file){
 }
 app.post(`${apiPrefix}getAllBrainImageByimageID`, VerifyToken, async (req, res) => {
     // If request comes to get detail of specific player
-        var account_id = req.body.accountid;
-        var image_id = req.body.imageid;
-		var CSDM_5 = await getBrainImageLink(account_id, image_id, 'CSDM-5.png');
-		var CSDM_10 = await getBrainImageLink(account_id, image_id, 'CSDM-10.png');
-		var CSDM_15 = await getBrainImageLink(account_id, image_id, 'CSDM-15.png');
-		var CSDM_30 = await getBrainImageLink(account_id, image_id, 'CSDM-30.png');
-		var MPS_95 = await getBrainImageLink(account_id, image_id, 'MPS-95.png');
-		var MPSR_120 = await getBrainImageLink(account_id, image_id,'MPSR-120.png');
-		var MPSxSR_28 = await getBrainImageLink(account_id,image_id, 'MPSxSR-28.png');
-		var MPSxSR_95 = await getBrainImageLink(account_id, image_id,'MPSxSR-95.png');
-		var axonal_strain_max = await getBrainImageLink(account_id, image_id, 'axonal-strain-max.png');
-		var masXsr_15_max = await getBrainImageLink(account_id, image_id,'masXsr-15-max.png');
-		var maximum_PSxSR = await getBrainImageLink(account_id, image_id,'maximum-PSxSR.png');
-		var principal_min_strain = await getBrainImageLink(account_id, image_id,'principal-min-strain.png');	
-		var principal_max_strain = await getBrainImageLink(account_id, image_id, 'principal-max-strain.png');		
-		var data = {
-			principal_max_strain: principal_max_strain ? `${principal_max_strain}` : 'Image not found',
-			CSDM_5: CSDM_5 ? `${CSDM_5}` : 'Image not found',
-			CSDM_10: CSDM_10 ? `${CSDM_10}` : 'Image not found',
-			CSDM_15: CSDM_15 ? `${CSDM_15}` : 'Image not found',
-			CSDM_30: CSDM_30 ? `${CSDM_30}` : 'Image not found',
-			MPS_95: MPS_95 ? `${MPS_95}` : 'Image not found',
-			MPSR_120: MPSR_120 ? `${MPSR_120}` : 'Image not found',
-			MPSxSR_28: MPSxSR_28 ? `${MPSxSR_28}` : 'Image not found',
-			MPSxSR_95: MPSxSR_95 ? `${MPSxSR_95}` : 'Image not found',
-			axonal_strain_max: axonal_strain_max ? `${axonal_strain_max}` : 'Image not found',
-			masXsr_15_max: masXsr_15_max ? `${masXsr_15_max}` : 'Image not found',
-			maximum_PSxSR: maximum_PSxSR ? `${maximum_PSxSR}` : 'Image not found',
-			principal_min_strain: principal_min_strain ? `${principal_min_strain}` : 'Image not found' 
-		};
-		console.log("data",data) 
-		res.send({
-			message: "success",
-			data: data, 
-		})		
-			
-	
-           
- });
+    var image_id = req.body.imageid;
+    getPlayerSimulationFile({ image_id })
+        .then(async result => {
+            var account_id = result.account_id;
+            var CSDM_5 = await getBrainImageLink(account_id, image_id, 'CSDM-5.png');
+            var CSDM_10 = await getBrainImageLink(account_id, image_id, 'CSDM-10.png');
+            var CSDM_15 = await getBrainImageLink(account_id, image_id, 'CSDM-15.png');
+            var CSDM_30 = await getBrainImageLink(account_id, image_id, 'CSDM-30.png');
+            var MPS_95 = await getBrainImageLink(account_id, image_id, 'MPS-95.png');
+            var MPSR_120 = await getBrainImageLink(account_id, image_id, 'MPSR-120.png');
+            var MPSxSR_28 = await getBrainImageLink(account_id, image_id, 'MPSxSR-28.png');
+            var MPSxSR_95 = await getBrainImageLink(account_id, image_id, 'MPSxSR-95.png');
+            var axonal_strain_max = await getBrainImageLink(account_id, image_id, 'axonal-strain-max.png');
+            var masXsr_15_max = await getBrainImageLink(account_id, image_id, 'masXsr-15-max.png');
+            var maximum_PSxSR = await getBrainImageLink(account_id, image_id, 'maximum-PSxSR.png');
+            var principal_min_strain = await getBrainImageLink(account_id, image_id, 'principal-min-strain.png');
+            var principal_max_strain = await getBrainImageLink(account_id, image_id, 'principal-max-strain.png');
+            var data = {
+                principal_max_strain: principal_max_strain ? `${principal_max_strain}` : 'Image not found',
+                CSDM_5: CSDM_5 ? `${CSDM_5}` : 'Image not found',
+                CSDM_10: CSDM_10 ? `${CSDM_10}` : 'Image not found',
+                CSDM_15: CSDM_15 ? `${CSDM_15}` : 'Image not found',
+                CSDM_30: CSDM_30 ? `${CSDM_30}` : 'Image not found',
+                MPS_95: MPS_95 ? `${MPS_95}` : 'Image not found',
+                MPSR_120: MPSR_120 ? `${MPSR_120}` : 'Image not found',
+                MPSxSR_28: MPSxSR_28 ? `${MPSxSR_28}` : 'Image not found',
+                MPSxSR_95: MPSxSR_95 ? `${MPSxSR_95}` : 'Image not found',
+                axonal_strain_max: axonal_strain_max ? `${axonal_strain_max}` : 'Image not found',
+                masXsr_15_max: masXsr_15_max ? `${masXsr_15_max}` : 'Image not found',
+                maximum_PSxSR: maximum_PSxSR ? `${maximum_PSxSR}` : 'Image not found',
+                principal_min_strain: principal_min_strain ? `${principal_min_strain}` : 'Image not found'
+            };
+            console.log("data", data)
+            res.send({
+                message: "success",
+                data: data,
+            })
+
+        })
+
+});
 app.post(`${apiPrefix}getBrainImageByimageID`, VerifyToken, (req, res) => {
     // If request comes to get detail of specific player
-        var account_id = req.body.accountid;
-        var image_id = req.body.imageid;
-				imagedata = [];
-				//  8709318680/simulation/TAgIdBbOD/BrainImages/CSDM-15.png
-				
-				console.log(account_id, account_id+'/simulation/'+image_id+'/BrainImages/CSDM-15.png')
-                getFileFromS3(account_id+'/simulation/'+image_id+'/BrainImages/CSDM-15.png','') 
-				.then(fileData => {
-					console.log("fileData",fileData)
-					if(fileData){
-						var CSDM15Data = "data:image/png;base64,"+fileData.Body.toString('base64');
-					}else{
-						CSDM15Data = "";
-						
-					}
-					imagedata.push({
-						CSDM15: CSDM15Data
-					})
-					getFileFromS3(account_id+'/simulation/'+image_id+'/BrainImages/principal-max-strain.png','') 
-					.then(file1Data => {
-					console.log("file1Data",file1Data)
-						if(file1Data){
-							var PMSData = "data:image/png;base64,"+file1Data.Body.toString('base64');
-						}else{
-							PMSData = "";
-							
-						}
-						imagedata.push({
-							PMS: PMSData
-						})
-						res.send({
-							message: "success",
-							data: imagedata, 
-						})
-					})
-				}).catch(err => {
-                console.log('err -------------- listorg \n', err)
-                res.send({
-                    message: "failure",
-                    error: err
-                })
+    var account_id = req.body.accountid;
+    var image_id = req.body.imageid;
+    imagedata = [];
+    //  8709318680/simulation/TAgIdBbOD/BrainImages/CSDM-15.png
+
+    console.log(account_id, account_id + '/simulation/' + image_id + '/BrainImages/CSDM-15.png')
+    getFileFromS3(account_id + '/simulation/' + image_id + '/BrainImages/CSDM-15.png', '')
+        .then(fileData => {
+            console.log("fileData", fileData)
+            if (fileData) {
+                var CSDM15Data = "data:image/png;base64," + fileData.Body.toString('base64');
+            } else {
+                CSDM15Data = "";
+
+            }
+            imagedata.push({
+                CSDM15: CSDM15Data
             })
- });
+            getFileFromS3(account_id + '/simulation/' + image_id + '/BrainImages/principal-max-strain.png', '')
+                .then(file1Data => {
+                    console.log("file1Data", file1Data)
+                    if (file1Data) {
+                        var PMSData = "data:image/png;base64," + file1Data.Body.toString('base64');
+                    } else {
+                        PMSData = "";
+
+                    }
+                    imagedata.push({
+                        PMS: PMSData
+                    })
+                    res.send({
+                        message: "success",
+                        data: imagedata,
+                    })
+                })
+        }).catch(err => {
+            console.log('err -------------- listorg \n', err)
+            res.send({
+                message: "failure",
+                error: err
+            })
+        })
+});
 app.post(`${apiPrefix}deleteOrgTeam`, (req, res) => {
     let type = req.body.type;
     let data = req.body.data;
@@ -14727,7 +14729,7 @@ app.post(`${apiPrefix}deleteOrgTeam2`, (req, res) => {
         }
         //console.log('image_id ----', record.image_id)
     })
-}); 
+});
 app.post(`${apiPrefix}deleteOrgTeam3`, (req, res) => {
     var data = req.body.data;
     let sensorlen = data.length;
@@ -14739,28 +14741,28 @@ app.post(`${apiPrefix}deleteOrgTeam3`, (req, res) => {
                 //console.log('image_Data root_path', image_Data.root_path)
                 //*** delete simulation file from s3
                 if (image_Data.root_path && image_Data.root_path != 'undefined') {
-                    emptyBucket({ bucket_name: image_Data.bucket_name, root_path: image_Data.account_id+'/' }, function (err, data) {
-                       // console.log(`------------- ${image_Data.root_path} folder has been deleted from s3`)
+                    emptyBucket({ bucket_name: image_Data.bucket_name, root_path: image_Data.account_id + '/' }, function (err, data) {
+                        // console.log(`------------- ${image_Data.root_path} folder has been deleted from s3`)
                         if (count1 == sensorlen) {
-							console.log("respose 1");
+                            console.log("respose 1");
                             res.send({
                                 message: 'success',
                                 status: 200
                             })
                         }
                     }).catch(err => {
-						if (count1 == sensorlen) {
-							console.log("respose 2");
-							res.send({
-								message: 'success',
-								status: 200
-							})
-						}
-					})
+                        if (count1 == sensorlen) {
+                            console.log("respose 2");
+                            res.send({
+                                message: 'success',
+                                status: 200
+                            })
+                        }
+                    })
 
                 } else {
                     if (count1 == sensorlen) {
-						console.log("respose 3");
+                        console.log("respose 3");
                         res.send({
                             message: 'success',
                             status: 200
@@ -14768,13 +14770,13 @@ app.post(`${apiPrefix}deleteOrgTeam3`, (req, res) => {
                     }
                 }
             }).catch(err => {
-				console.log("respose 4");
-				if (count1 == sensorlen) {
-					res.send({
-						message: 'success',
-						status: 200
-					})
-				}
+                console.log("respose 4");
+                if (count1 == sensorlen) {
+                    res.send({
+                        message: 'success',
+                        status: 200
+                    })
+                }
             })
     })
 });
@@ -14799,16 +14801,16 @@ app.post(`${apiPrefix}deleteOrgTeam4`, (req, res) => {
                     status: 200
                 })
             }
-        }) 
+        })
     } else {
         res.send({
-            message: 'success',   
+            message: 'success',
             status: 200
         })
     }
 });
 
-function InsertSensorDataByPlayerID(sensorNewData) { 
+function InsertSensorDataByPlayerID(sensorNewData) {
 
     return new Promise((resolve, reject) => {
         if (sensorNewData) {
