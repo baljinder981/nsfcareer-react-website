@@ -74,7 +74,7 @@ function getUserDetailByPlayerId(sensor_id_number) {
        
         params = {
             TableName: "users",
-            FilterExpression: "contains(player_id, :player_id)",
+            FilterExpression: "contains(user_cognito_id, :player_id)",
             ExpressionAttributeValues: {
                 ":player_id": sensor_id_number
             }
