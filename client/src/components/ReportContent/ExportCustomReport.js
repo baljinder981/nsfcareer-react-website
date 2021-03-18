@@ -1302,9 +1302,9 @@ class ExportCustomReport extends React.Component {
 						{<View style={stylepage4.blueLine1}></View>}
                         <View style={styles.tableRow}>						
                             <Text style={styles.tableColLeftfull}> Report Date Range : <Text style={{ color: '#2d549a' }}> {this.state.impact_date}</Text> - <Text style={{ color: '#2d549a' }}> {this.getDateInFormat()} </Text> </Text>
-                            <Text style={styles.tableColLeft20}> DOB : <Text style={{ color: '#2d549a' }}>{this.state.jsonData['playerdata'].dob?this.state.jsonData['playerdata'].dob:"N/A"}</Text></Text>
+                            <Text style={styles.tableColLeft20}> DOB : <Text style={{ color: '#2d549a' }}>{this.state.jsonData['playerdata']?this.state.jsonData['playerdata'].dob:"N/A"}</Text></Text>
                             <Text style={styles.tableColRight}> Sensor ID : 
-								{this.state.jsonData['playerdata'].sensor_id_number ?
+								{this.state.jsonData['playerdata'] ?
 									<>
 										<Text style={{ color: '#2d549a' }}>
 											{this.state.jsonData['playerdata'].sensor_id_number} ( {this.state.jsonData['playerdata'].sensor} )
@@ -1319,7 +1319,7 @@ class ExportCustomReport extends React.Component {
                         </View>
                         <View style={styles.tableRow}>
                             <Text style={styles.tableColLeftfull}> Team : <Text style={{ color: '#2d549a' }}> {this.state.data['team']} </Text> </Text>
-                            <Text style={styles.tableColLeft20}> Sex : <Text style={{ color: '#2d549a' }}>{this.state.jsonData['playerdata'].gender?this.state.jsonData['playerdata'].gender:"N/A"}  </Text></Text>
+                            <Text style={styles.tableColLeft20}> Sex : <Text style={{ color: '#2d549a' }}>{this.state.jsonData['playerdata']?this.state.jsonData['playerdata'].gender:"N/A"}  </Text></Text>
                             <Text style={styles.tableColRight}> Organization : <Text style={{ color: '#2d549a' }}>{this.state.data['organization']?this.state.data['organization']:this.state.data1.organization} </Text></Text>
 
                         </View>						
