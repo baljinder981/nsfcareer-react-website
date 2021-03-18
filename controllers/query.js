@@ -909,6 +909,7 @@ function addPlayerToTeamOfOrganization(sensor, user_cognito_id, org, team, playe
                                 organization: org,
                                 team_name: team,
                                 requested_player_list: [player_id]
+                        
                             },
                         };
                         docClient.put(dbInsert, function (err, data) {
@@ -929,7 +930,9 @@ function addPlayerToTeamOfOrganization(sensor, user_cognito_id, org, team, playe
                             user_cognito_id: user_cognito_id,
                             organization: org,
                             team_name: team,
-                            requested_player_list: [player_id]
+                            requested_player_list: [player_id],
+                            entityID: 'EID'+ Date.now()
+                         
                         },
                     };
                     docClient.put(dbInsert, function (err, data) {
@@ -2759,7 +2762,8 @@ function addOrganization(OrganizationName, sensor) {
                 player_list: [],
                 sensor: sensor,
                 team_name: null,
-                user_cognito_id: null
+                user_cognito_id: null,
+                entityID: 'EID'+ Date.now()
             }
         }
 

@@ -53,15 +53,17 @@ class Rankedmpschart extends React.Component {
         let pointsData = [];
         let labelData = []
         var max_element_val = 10;
+        // console.log('points ----------------------\n',points)
         for (var i = 0; i < points.length; i++) {
-            console.log('parseFloat(points[i].id)',parseFloat(points[i].id))
+            // console.log('parseFloat(points[i].id)',parseFloat(points[i].id))
             pointsData.push({ y: points[i].val, x: points[i].id });
             labelData.push(points[i].id)
         }
-
+        // console.log('labelData ----------------------/n',JSON.stringify(labelData))
         if (points.length > 0) {
             max_element_val = labelData.reduce((a, b) => Math.max(a, b));
         }
+        // console.log('max_element_val ----------------------',max_element_val)
         const makeArr = (startValue, stopValue, cardinality) => {
             var arr = [];
             var step = (stopValue - startValue) / (cardinality - 1);
@@ -70,9 +72,11 @@ class Rankedmpschart extends React.Component {
             }
             return arr;
         }
-        var label = makeArr(0, max_element_val, 100);
+        var label = makeArr(0, max_element_val, max_element_val);
+        // console.log('label ----------------------------\n',label)
+
         pointsData.sort(function (a, b) {
-            return b.y - a.y
+            return a.x - b.x; 
         })
 
         console.log('pointsData', pointsData)

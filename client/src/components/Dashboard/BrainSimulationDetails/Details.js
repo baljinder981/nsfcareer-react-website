@@ -274,8 +274,8 @@ class Details extends React.Component {
   };
   showinjury = () => {
 		this.setState({ showPMS: "none", showinjury: "block", showMASxSR: "none", showCSDM: "none", showMPS: "none", showPMS1: false, showinjury1: true, showMPS1: false, showCSDM1: false, showMASxSR1: false, })
-		console.log(this.state.showinjury)
-		console.log(this.state.showinjury1)
+		// console.log(this.state.showinjury)
+		// console.log(this.state.showinjury1)
   };
   setRangeValue = (value) => {
     if (_isFirstUpdate === '') {
@@ -554,9 +554,9 @@ class Details extends React.Component {
         the.setState({ framesofSimulationVideo: frameRate, framesRateSimulationVideo: 29.7 })
         the.setState({ lengthofSimulationVideo: the.getVideoTime(video.duration) })
         // },1000)
-        console.log("Video Length", this.state.lengthofSimulationVideo);
-        console.log("Video frames", this.state.framesofSimulationVideo);
-        console.log("Video Rate", this.state.framesRateSimulationVideo);
+        // console.log("Video Length", this.state.lengthofSimulationVideo);
+        // console.log("Video frames", this.state.framesofSimulationVideo);
+        // console.log("Video Rate", this.state.framesRateSimulationVideo);
       }
     }
     if (video && this.state.video_lock_time_2) {
@@ -758,7 +758,7 @@ class Details extends React.Component {
 
   flipVideo = ()=>{
     this.setState({label_flipVideo: 'Mirroring...'})
-	console.log('video_url',this.state.impact_video_url);
+	// console.log('video_url',this.state.impact_video_url);
     flipVideo({ image_id: this.state.image_id, impact_video_url: this.state.impact_video_url, trim_video_path: this.state.trim_video_url})
     .then(response => {
       //    console.log('response trim video ---\n', response);
@@ -1412,14 +1412,14 @@ class Details extends React.Component {
 
   componentDidMount() {	
 	var playerid1 = this.props.match.params.player_id.split('$')[0];
-	console.log("playerid1",playerid1+'-');
+	// console.log("playerid1",playerid1+'-');
 	getUserDataByPlayerID({ playerid: playerid1+'-'})
 	.then(response1 => {
 		var imageid = this.props.match.params.image_id;
-		var accountid = response1.data.data[0].account_id;
-		getAllBrainImageByimageID({ accountid: accountid, imageid: imageid})
+		// var accountid = response1.data.data[0].account_id;
+		getAllBrainImageByimageID({imageid: imageid})
 		.then(imageresponse1 => {
-			console.log('jsondata image data ----\n', imageresponse1.data.data)
+			// console.log('jsondata image data ----\n', imageresponse1.data.data)
 			this.setState({
 				Brainimages: imageresponse1.data.data,
 			});

@@ -150,8 +150,8 @@ class HeadAccelerationAllEvents extends React.Component {
                             response.data.data.jsonOutputFile["playerdata"] = response1.data.data[0];
                             console.log('playerdata ----\n', response1.data.data[0])
                             var imageid = this.props.data.sensor_data.image_id;
-                            var accountid = response1.data.data[0].account_id;
-                            getBrainImageByimageID({ accountid: accountid, imageid: imageid })
+                            // var accountid = response1.data.data[0].account_id;
+                            getBrainImageByimageID({ imageid: imageid })
                                 .then(imageresponse1 => {
                                     response.data.data.jsonOutputFile["imagedata"] = imageresponse1.data.data;
                                     console.log('jsondata image data ----\n', response.data.data)

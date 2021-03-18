@@ -233,11 +233,11 @@ const {
     getOrgpTeamFromSensorDetails,
     getOrgFromSensorDetailsr,
     addJobslog,
-	getUserDbDataByAccountId,
-	getSensorDataByPlayerID,	
-	InsertNewSensorDataByPlayerID,
-	DeleteSensorDataByPlayerID,
-	updateuseraccess,
+    getUserDbDataByAccountId,
+    getSensorDataByPlayerID,
+    InsertNewSensorDataByPlayerID,
+    DeleteSensorDataByPlayerID,
+    updateuseraccess,
 
 } = require('./controllers/query');
 
@@ -14582,39 +14582,49 @@ app.post(`${apiPrefix}getAllBrainImageByimageID`, VerifyToken, async (req, res) 
 });
 app.post(`${apiPrefix}getBrainImageByimageID`, VerifyToken, (req, res) => {
     // If request comes to get detail of specific player
-    var account_id = req.body.accountid;
+
     var image_id = req.body.imageid;
     imagedata = [];
     //  8709318680/simulation/TAgIdBbOD/BrainImages/CSDM-15.png
-
-    console.log(account_id, account_id + '/simulation/' + image_id + '/BrainImages/CSDM-15.png')
-    getFileFromS3(account_id + '/simulation/' + image_id + '/BrainImages/CSDM-15.png', '')
-        .then(fileData => {
-            console.log("fileData", fileData)
-            if (fileData) {
-                var CSDM15Data = "data:image/png;base64," + fileData.Body.toString('base64');
-            } else {
-                CSDM15Data = "";
-
-            }
-            imagedata.push({
-                CSDM15: CSDM15Data
-            })
-            getFileFromS3(account_id + '/simulation/' + image_id + '/BrainImages/principal-max-strain.png', '')
-                .then(file1Data => {
-                    console.log("file1Data", file1Data)
-                    if (file1Data) {
-                        var PMSData = "data:image/png;base64," + file1Data.Body.toString('base64');
+    var image_id = req.body.imageid;
+    getPlayerSimulationFile({ image_id })
+        .then(async result => {
+            var account_id = result.account_id;
+            console.log(account_id, account_id + '/simulation/' + image_id + '/BrainImages/CSDM-15.png')
+            getFileFromS3(account_id + '/simulation/' + image_id + '/BrainImages/CSDM-15.png', '')
+                .then(fileData => {
+                    console.log("fileData", fileData)
+                    if (fileData) {
+                        var CSDM15Data = "data:image/png;base64," + fileData.Body.toString('base64');
                     } else {
-                        PMSData = "";
+                        CSDM15Data = "";
 
                     }
                     imagedata.push({
-                        PMS: PMSData
+                        CSDM15: CSDM15Data
                     })
+                    getFileFromS3(account_id + '/simulation/' + image_id + '/BrainImages/principal-max-strain.png', '')
+                        .then(file1Data => {
+                            console.log("file1Data", file1Data)
+                            if (file1Data) {
+                                var PMSData = "data:image/png;base64," + file1Data.Body.toString('base64');
+                            } else {
+                                PMSData = "";
+
+                            }
+                            imagedata.push({
+                                PMS: PMSData
+                            })
+                            res.send({
+                                message: "success",
+                                data: imagedata,
+                            })
+                        })
+                }).catch(err => {
+                    console.log('err -------------- listorg \n', err)
                     res.send({
-                        message: "success",
-                        data: imagedata,
+                        message: "failure",
+                        error: err
                     })
                 })
         }).catch(err => {
@@ -14623,154 +14633,178 @@ app.post(`${apiPrefix}getBrainImageByimageID`, VerifyToken, (req, res) => {
                 message: "failure",
                 error: err
             })
-        })
-});
-app.post(`${apiPrefix}deleteOrgTeam`, (req, res) => {
-    let type = req.body.type;
-    let data = req.body.data;
-    if (type == 'orgTeam') {
-        getOrganizationTeamData({ sensor: data.brand, organization: data.organization, team: data.TeamName })
-            .then(result => {
-                //  console.log('result ----------------', result)
-                let sensorlen = result.length;
-                let count1 = 0;
-                let count3 = 0;
-                //  console.log(sensorlen)
-                if (sensorlen > 0) {
-                    res.send({
-                        message: 'success',
-                        status: 200,
-                        data: result
-                    })
-                } else {
-                    res.send({
-                        message: 'success',
-                        status: 200,
-                        data: ""
-                    })
+        });
+})
+    app.post(`${apiPrefix}deleteOrgTeam`, (req, res) => {
+        let type = req.body.type;
+        let data = req.body.data;
+        if (type == 'orgTeam') {
+            getOrganizationTeamData({ sensor: data.brand, organization: data.organization, team: data.TeamName })
+                .then(result => {
+                    //  console.log('result ----------------', result)
+                    let sensorlen = result.length;
+                    let count1 = 0;
+                    let count3 = 0;
+                    //  console.log(sensorlen)
+                    if (sensorlen > 0) {
+                        res.send({
+                            message: 'success',
+                            status: 200,
+                            data: result
+                        })
+                    } else {
+                        res.send({
+                            message: 'success',
+                            status: 200,
+                            data: ""
+                        })
 
-                }
-            })
+                    }
+                })
 
-    }
-});
-app.post(`${apiPrefix}deleteOrgTeam1`, (req, res) => {
-    let type = req.body.type;
-    let data = req.body.data;
-    if (type == 'orgTeam') {
-        getOrganizatonByTeam(data.organization, data.TeamName, data.brand)
-            .then(org => {
-                var orglen = org.length;
-                orglen = orglen - 1;
-                if (org) {
-                    org.forEach(function (record, index) {
-                        //console.log('record', record.organization_id);
-                        //console.log(index, orglen)
-                        DeleteOrganization(record.organization_id)
-                            .then(data => {
-                                //console.log('res', data)
-                                if (index == orglen) {
-                                    res.send({
-                                        message: 'success',
-                                        status: 200
-                                    })
-                                }
-                            }).catch(err => {
-                                //console.log('err', err)
-                                if (index == orglen) {
-                                    res.send({
-                                        message: 'failure',
-                                        status: 300,
-                                        err: err
-                                    })
-                                }
-                            })
-                    })
-                } else {
+        }
+    });
+    app.post(`${apiPrefix}deleteOrgTeam1`, (req, res) => {
+        let type = req.body.type;
+        let data = req.body.data;
+        if (type == 'orgTeam') {
+            getOrganizatonByTeam(data.organization, data.TeamName, data.brand)
+                .then(org => {
+                    var orglen = org.length;
+                    orglen = orglen - 1;
+                    if (org) {
+                        org.forEach(function (record, index) {
+                            //console.log('record', record.organization_id);
+                            //console.log(index, orglen)
+                            DeleteOrganization(record.organization_id)
+                                .then(data => {
+                                    //console.log('res', data)
+                                    if (index == orglen) {
+                                        res.send({
+                                            message: 'success',
+                                            status: 200
+                                        })
+                                    }
+                                }).catch(err => {
+                                    //console.log('err', err)
+                                    if (index == orglen) {
+                                        res.send({
+                                            message: 'failure',
+                                            status: 300,
+                                            err: err
+                                        })
+                                    }
+                                })
+                        })
+                    } else {
+                        res.send({
+                            message: 'failure',
+                            status: 300,
+                            err: err
+                        })
+                    }
+                }).catch(err => {
+                    //console.log('err', err)
                     res.send({
                         message: 'failure',
                         status: 300,
                         err: err
                     })
-                }
-            }).catch(err => {
-                //console.log('err', err)
-                res.send({
-                    message: 'failure',
-                    status: 300,
-                    err: err
-                })
-            })
-    }
-});
-app.post(`${apiPrefix}deleteOrgTeam2`, (req, res) => {
-    var data = req.body.data;
-    let sensorlen = data.length;
-    let count1 = 0;
-    data.forEach(async function (record, index) {
-        count1++;
-        console.log('record.player_id ----------------------', record.org_id, record.player_id)
-        if (record.org_id && record.player_id) {
-            deleteSensorData(record.org_id, record.player_id)
-                .then(deldata => {
-                    //console.log('deldata', deldata)
-                    if (count1 == sensorlen) {
-                        res.send({
-                            message: 'success',
-                            status: 200
-                        })
-                    }
-                }).catch(err => {
-                    res.send({
-                        message: 'faled',
-                        status: 300
-                    })
                 })
         }
-        //console.log('image_id ----', record.image_id)
-    })
-});
-app.post(`${apiPrefix}deleteOrgTeam3`, (req, res) => {
-    var data = req.body.data;
-    let sensorlen = data.length;
-    let count1 = 0;
-    data.forEach(async function (record, index) {
-        getPlayerSimulationFile({ image_id: record.image_id })
-            .then(image_Data => {
-                count1++;
-                //console.log('image_Data root_path', image_Data.root_path)
-                //*** delete simulation file from s3
-                if (image_Data.root_path && image_Data.root_path != 'undefined') {
-                    emptyBucket({ bucket_name: image_Data.bucket_name, root_path: image_Data.account_id + '/' }, function (err, data) {
-                        // console.log(`------------- ${image_Data.root_path} folder has been deleted from s3`)
+    });
+    app.post(`${apiPrefix}deleteOrgTeam2`, (req, res) => {
+        var data = req.body.data;
+        let sensorlen = data.length;
+        let count1 = 0;
+        data.forEach(async function (record, index) {
+            count1++;
+            console.log('record.player_id ----------------------', record.org_id, record.player_id)
+            if (record.org_id && record.player_id) {
+                deleteSensorData(record.org_id, record.player_id)
+                    .then(deldata => {
+                        //console.log('deldata', deldata)
                         if (count1 == sensorlen) {
-                            console.log("respose 1");
                             res.send({
                                 message: 'success',
                                 status: 200
                             })
                         }
                     }).catch(err => {
+                        res.send({
+                            message: 'faled',
+                            status: 300
+                        })
+                    })
+            }
+            //console.log('image_id ----', record.image_id)
+        })
+    });
+    app.post(`${apiPrefix}deleteOrgTeam3`, (req, res) => {
+        var data = req.body.data;
+        let sensorlen = data.length;
+        let count1 = 0;
+        data.forEach(async function (record, index) {
+            getPlayerSimulationFile({ image_id: record.image_id })
+                .then(image_Data => {
+                    count1++;
+                    //console.log('image_Data root_path', image_Data.root_path)
+                    //*** delete simulation file from s3
+                    if (image_Data.root_path && image_Data.root_path != 'undefined') {
+                        emptyBucket({ bucket_name: image_Data.bucket_name, root_path: image_Data.account_id + '/' }, function (err, data) {
+                            // console.log(`------------- ${image_Data.root_path} folder has been deleted from s3`)
+                            if (count1 == sensorlen) {
+                                console.log("respose 1");
+                                res.send({
+                                    message: 'success',
+                                    status: 200
+                                })
+                            }
+                        }).catch(err => {
+                            if (count1 == sensorlen) {
+                                console.log("respose 2");
+                                res.send({
+                                    message: 'success',
+                                    status: 200
+                                })
+                            }
+                        })
+
+                    } else {
                         if (count1 == sensorlen) {
-                            console.log("respose 2");
+                            console.log("respose 3");
                             res.send({
                                 message: 'success',
                                 status: 200
                             })
                         }
-                    })
-
-                } else {
+                    }
+                }).catch(err => {
+                    console.log("respose 4");
                     if (count1 == sensorlen) {
-                        console.log("respose 3");
                         res.send({
                             message: 'success',
                             status: 200
                         })
                     }
-                }
-            }).catch(err => {
-                console.log("respose 4");
+                })
+        })
+    });
+    app.post(`${apiPrefix}deleteOrgTeam4`, (req, res) => {
+        var data = req.body.data;
+        console.log('data', data);
+        let sensorlen = data.length;
+        console.log('data.sensorlen', sensorlen);
+        let count1 = 0;
+        if (sensorlen > 0) {
+            data.forEach(async function (record, index) {
+                count1++;
+                deleteSimulation_imagesData(record.image_id)
+                    .then(deldata => {
+                        console.log('deldata  org', deldata)
+                    }).catch(err => {
+                        console.log('deldata  err', err)
+                    })
                 if (count1 == sensorlen) {
                     res.send({
                         message: 'success',
@@ -14778,190 +14812,166 @@ app.post(`${apiPrefix}deleteOrgTeam3`, (req, res) => {
                     })
                 }
             })
-    })
-});
-app.post(`${apiPrefix}deleteOrgTeam4`, (req, res) => {
-    var data = req.body.data;
-    console.log('data', data);
-    let sensorlen = data.length;
-    console.log('data.sensorlen', sensorlen);
-    let count1 = 0;
-    if (sensorlen > 0) {
-        data.forEach(async function (record, index) {
-            count1++;
-            deleteSimulation_imagesData(record.image_id)
-                .then(deldata => {
-                    console.log('deldata  org', deldata)
-                }).catch(err => {
-                    console.log('deldata  err', err)
+        } else {
+            res.send({
+                message: 'success',
+                status: 200
+            })
+        }
+    });
+
+    function InsertSensorDataByPlayerID(sensorNewData) {
+
+        return new Promise((resolve, reject) => {
+            if (sensorNewData) {
+                var datalength = sensorNewData.length;
+                var count = 0;
+                sensorNewData.forEach(function (sensorData, index) {
+                    InsertNewSensorDataByPlayerID(sensorData)
+                        .then(insertData => {
+                            count++
+                            if (count == datalength) {
+                                resolve("sucess");
+                            }
+                        })
+
                 })
-            if (count1 == sensorlen) {
+            } else {
+                resolve('');
+            }
+        })
+    }
+    app.post(`${apiPrefix}deleteEventByImageID`, (req, res) => {
+        var data = req.body;
+        var organization = data.organization;
+        var playerid = data.playerid;
+        var image_id = data.image_id;
+        var account_id = data.account_id;
+        getPlayerSimulationFile({ image_id: data.image_id })
+            .then(image_Data => {
+                console.log('image_Data', image_Data)
+                getSensorDataByPlayerID(playerid.split("$")[0] + "$")
+                    .then(sensor_Data => {
+                        var datalength = sensor_Data.length;
+                        var count = 0;
+                        var sensorNewData = [];
+                        sensor_Data.forEach(function (sensorData, index) {
+                            count++;
+                            var newPlayer_id = sensorData.player_id;
+                            var newOrg_id = sensorData.org_id;
+                            if (image_id != sensorData.image_id) {
+                                sensorNewData.push(sensorData);
+                            }
+                            if (count == datalength) {
+                                DeleteSensorDataByPlayerID(newPlayer_id, newOrg_id)
+                                    .then(async deleteData => {
+                                        if (sensorNewData.length > 0) {
+                                            var insetdata = await InsertSensorDataByPlayerID(sensorNewData);
+                                            deleteSimulation_imagesData(data.image_id)
+                                                .then(deldata => {
+                                                    console.log("image_Data 1", image_Data)
+                                                    if (image_Data !== undefined) {
+                                                        if (image_Data.root_path && image_Data.root_path != 'undefined') {
+                                                            var rootpath = image_Data.root_path;
+                                                            var lastchar = rootpath.slice(-1);
+                                                            if (lastchar == "/") {
+                                                                rootpath = image_Data.root_path;
+                                                            } else {
+                                                                rootpath = image_Data.root_path + "/";
+                                                            }
+                                                            emptyBucket({ bucket_name: image_Data.bucket_name, root_path: rootpath }, function (err, data1) {
+                                                                console.log("data1", data1);
+                                                                res.send({
+                                                                    message: 'success',
+                                                                    status: 200
+                                                                })
+                                                            })
+                                                        } else {
+                                                            res.send({
+                                                                message: 'success',
+                                                                status: 200
+                                                            })
+                                                        }
+                                                    } else {
+                                                        res.send({
+                                                            message: 'success',
+                                                            status: 200
+                                                        })
+                                                    }
+                                                }).catch(err => {
+                                                    console.log('deldata1  err', err)
+                                                })
+                                        } else {
+                                            deleteSimulation_imagesData(data.image_id)
+                                                .then(deldata => {
+                                                    console.log("image_Data 2", image_Data)
+                                                    if (image_Data !== undefined) {
+                                                        if (image_Data.root_path && image_Data.root_path != 'undefined') {
+                                                            emptyBucket({ bucket_name: image_Data.bucket_name, root_path: image_Data.root_path }, function (err, data1) {
+                                                                console.log("data1", data1);
+                                                                res.send({
+                                                                    message: 'success',
+                                                                    status: 200
+                                                                })
+                                                            })
+                                                        } else {
+                                                            res.send({
+                                                                message: 'success',
+                                                                status: 200
+                                                            })
+                                                        }
+                                                    } else {
+                                                        res.send({
+                                                            message: 'success',
+                                                            status: 200
+                                                        })
+                                                    }
+                                                }).catch(err => {
+                                                    console.log('deldata2  err', err)
+                                                })
+
+                                        }
+
+                                    }).catch(err => {
+                                        console.log('deldata3  err', err)
+                                    })
+                            }
+
+
+                        });
+
+
+                    }).catch(err => {
+                        console.log('deldata4  err', err)
+                    })
+            }).catch(err => {
+                console.log('deldata5  err', err)
+            })
+    });
+    // Clearing the cookies
+    app.post(`${apiPrefix}logOut`, (req, res) => {
+        res.cookie("token", "");
+        res.send({
+            message: "success"
+        });
+    })
+    // update user access
+    app.post(`${apiPrefix}updateuseraccess`, (req, res) => {
+        var data = req.body;
+        var cognito_id = data.data.cognito_id;
+        updateuseraccess(data)
+            .then(response => {
                 res.send({
                     message: 'success',
                     status: 200
                 })
-            }
-        })
-    } else {
-        res.send({
-            message: 'success',
-            status: 200
-        })
-    }
-});
-
-function InsertSensorDataByPlayerID(sensorNewData) {
-
-    return new Promise((resolve, reject) => {
-        if (sensorNewData) {
-			var datalength = sensorNewData.length;
-			var count = 0;
-			sensorNewData.forEach(function (sensorData, index) {
-				InsertNewSensorDataByPlayerID(sensorData)
-				.then(insertData => {
-					count++
-					if(count == datalength){ 
-						resolve("sucess");
-					}
-				})
-				
-			})
-			} else {
-            resolve('');
-        }
+            }).catch(err => {
+                res.send({
+                    message: 'faled',
+                    status: 300
+                })
+            })
     })
-}
-app.post(`${apiPrefix}deleteEventByImageID`, (req, res) => {
-    var data = req.body;
-    var organization = data.organization;
-    var playerid = data.playerid;
-    var image_id = data.image_id;
-    var account_id = data.account_id;
-	 getPlayerSimulationFile({ image_id: data.image_id })
-	.then(image_Data => {
-		console.log('image_Data',image_Data) 
-		 getSensorDataByPlayerID(playerid.split("$")[0]+"$")
-		.then(sensor_Data => {
-			var datalength = sensor_Data.length;
-			var count = 0;
-			var sensorNewData = [];
-			sensor_Data.forEach( function (sensorData, index) {
-			 count++;
-				var newPlayer_id = sensorData.player_id;
-				var newOrg_id = sensorData.org_id;
-				if(image_id != sensorData.image_id){					
-					sensorNewData.push(sensorData);					
-				}			
-				if(count == datalength){ 
-					DeleteSensorDataByPlayerID(newPlayer_id,newOrg_id)
-					.then( async deleteData => {	
-						if(sensorNewData.length > 0){						
-							var insetdata = await InsertSensorDataByPlayerID(sensorNewData);
-							deleteSimulation_imagesData(data.image_id)
-							.then(deldata => {
-								console.log("image_Data 1",image_Data)
-								if (image_Data !== undefined){
-									if(image_Data.root_path && image_Data.root_path != 'undefined') {
-										var rootpath = image_Data.root_path;
-										var lastchar = rootpath.slice(-1);
-										if(lastchar == "/"){
-											rootpath = image_Data.root_path;
-										}else{
-											rootpath = image_Data.root_path+"/"; 
-										}
-										emptyBucket({ bucket_name: image_Data.bucket_name, root_path: rootpath }, function (err, data1) {
-											console.log("data1",data1);
-												res.send({
-													message: 'success',
-													status: 200
-												})
-										})
-									}else{
-										res.send({
-											message: 'success',
-											status: 200
-										})
-									}
-								}else{
-									res.send({
-										message: 'success',
-										status: 200
-									})
-								}
-							}).catch(err => {
-								console.log('deldata1  err', err)
-							})
-						}else{
-							deleteSimulation_imagesData(data.image_id) 
-							.then(deldata => {
-								console.log("image_Data 2",image_Data)
-								if (image_Data !== undefined){
-									 if (image_Data.root_path && image_Data.root_path != 'undefined') {
-										emptyBucket({ bucket_name: image_Data.bucket_name, root_path: image_Data.root_path }, function (err, data1) {	
-											console.log("data1",data1);
-												res.send({
-													message: 'success',
-													status: 200
-												})
-										})
-									}else{
-										res.send({
-											message: 'success',
-											status: 200
-										})
-									}
-								}else{
-									res.send({
-										message: 'success',
-										status: 200
-									})
-								}
-							}).catch(err => {
-								console.log('deldata2  err', err)
-							})
-
-						}
-					
-					}).catch(err => {
-						console.log('deldata3  err', err)
-					})
-				}
-				
-				 
-			});
-		
-			
-		}).catch(err => {
-			console.log('deldata4  err', err)
-		}) 
-	}).catch(err => {
-		console.log('deldata5  err', err)
-	}) 
-});
-// Clearing the cookies
-app.post(`${apiPrefix}logOut`, (req, res) => {
-    res.cookie("token", "");
-    res.send({
-        message: "success"
-    });
-})
-// update user access
-app.post(`${apiPrefix}updateuseraccess`, (req, res) => {
-	var data = req.body;
-	var cognito_id = data.data.cognito_id;
-	updateuseraccess(data) 
-	.then(response => {
-		res.send({
-			message: 'success',
-			status: 200
-		})
-	}).catch(err => {
-		res.send({
-			message: 'faled',
-			status: 300
-		})
-	})
-})
-const port = process.env.PORT || 3001;
-// Configuring port for APP
-server.listen(port, () => console.log(`Listening on port ${port}`))
+    const port = process.env.PORT || 3001;
+    // Configuring port for APP
+    server.listen(port, () => console.log(`Listening on port ${port}`))
