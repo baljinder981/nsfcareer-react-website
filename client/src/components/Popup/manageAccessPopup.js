@@ -136,9 +136,9 @@ class manageAccessPopup extends React.Component {
 
           <h2>Manage Access</h2>
 		  <h3>{this.props.data.name}</h3>
-			<label style={{'width':'50%','text-align': 'left','font-size': '20px','font-weight': '500'}}><input type="checkbox" name="superadmin" class="superadmin" checked ={this.state.superadminvalue} onChange={this.handleAccessFor} value="Super Addmin" style={{'width': '20px','height': '20px','margin-right': '15px'}} /> Super Addmin</label>
-			<label style={{'width':'50%','text-align': 'left','font-size': '20px','font-weight': '500'}}><input type="checkbox" name="apiaccess" class="apiaccess" checked ={this.state.apiAccessvalue} onChange={this.handleAccessFor} value="API Access" style={{'width': '20px','height': '20px','margin-right': '15px'}} /> API Access</label>
-			<label style={{'width':'50%','text-align': 'left','font-size': '20px','font-weight': '500'}}><input type="checkbox" name="portelaccess" class="portelaccess" checked ={this.state.simulationportelaccessvalue} onChange={this.handleAccessFor} value="Simulation Portel Access" style={{'width': '20px','height': '20px','margin-right': '15px'}}/> Simulation Portel Access</label>
+			<label style={{'width':'50%','text-align': 'left','font-size': '20px','font-weight': '500'}}><input type="radio" name="access" class="superadmin" checked ={this.state.superadminvalue} onChange={this.handleAccessFor} value="Super Addmin" style={{'width': '20px','height': '20px','margin-right': '15px'}} /> Super Addmin</label>
+			<label style={{'width':'50%','text-align': 'left','font-size': '20px','font-weight': '500'}}><input type="radio" name="access" class="apiaccess" checked ={this.state.apiAccessvalue} onChange={this.handleAccessFor} value="API Access" style={{'width': '20px','height': '20px','margin-right': '15px'}} /> API Access</label>
+			<label style={{'width':'50%','text-align': 'left','font-size': '20px','font-weight': '500'}}><input type="radio" name="access" class="portelaccess" checked ={this.state.simulationportelaccessvalue} onChange={this.handleAccessFor} value="Simulation Portel Access" style={{'width': '20px','height': '20px','margin-right': '15px'}}/> Simulation Portel Access</label>
           <div className="delete-confirmation-button">
             <button className="btn button-back"  onClick={this.handlesave}>Revoke Access</button>            
           </div>

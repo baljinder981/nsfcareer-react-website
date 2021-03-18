@@ -255,7 +255,7 @@ class DownloadReportPopup extends React.Component {
 					  <PDFDownloadLink document={<Report Metric={this.state} jsonfile={this.props.data.brainRegions} data={this.props.data.data} />} className="export-cumulative-player" fileName={fileName} style={{
 						color: 'white'
 						}}>
-						  <button className="Download-button-custom-report" style={{'margin-top': '6px'}}>Download</button>
+						  <button className="Download-button-custom-report" onClick={() => setTimeout(() => this.props.makeVisible({ display: 'none' }) , 100)} style={{'margin-top': '6px'}}>Download</button>
 						{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download now!')}
 					  </PDFDownloadLink>
 					}

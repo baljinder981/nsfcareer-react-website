@@ -8,7 +8,7 @@ import trangle_red from './trangle_red.png';
 import arrow_left from './arrow_left.png'
 import arrow_right from './arrow_right.png'
 
-import ClinicalReportHeader from './Clinical-Report-Header.png';
+import ClinicalReportHeader from './Clinical-Report-Header-Combined.png';
 import taxture1 from './taxture1.png';
 import branImages_1 from './branImages_1.png';
 import brainimage_2 from './brainimage_2.png';

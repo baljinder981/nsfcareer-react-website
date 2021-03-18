@@ -864,13 +864,13 @@ class OrganizationAdmin extends React.Component {
 												}
                                                     {staffList[0] && staffList[0].map(function (staff, index) {
                                                         if(staff.data){
-                                                            if(staff.data.level === 400){
+                                                            if(staff.data.level === 400 || staff.data.level === 300 ||staff.data.level === 290 || staff.data.level === 280){
                                                                 return <tr className="player-data-table-row" key={index} >
                                                                     <td onClick={()=>{if(staff.data && level === 1000){ var win = window.open('/admin/view/user?id='+staff.data.user_cognito_id); win.focus();} }}>
 																	{staff.data ?  index + 1 : ''}</td>
                                                                     <td onClick={()=>{if(staff.data && level === 1000){ var win = window.open('/admin/view/user?id='+staff.data.user_cognito_id); win.focus();} }}>{staff.data ? staff.data.first_name : ''} {staff.data ? staff.data.last_name : ''}</td>
 																	{This.state.userDetails.level === 1000 &&
-																		<td>
+																		<td> 
 																		{staff.data.superadmin == 1 ? 
 																		<i class="fa fa-check" style={{ 'font-size': '24px','color': 'green' }}></i>
 																		:

@@ -3930,24 +3930,57 @@ function InsertNewSensorDataByPlayerID(obj) {
 function updateuseraccess(data) {
     console.log('data ',data);
      return new Promise((resolve, reject) => {
+		 var level = 0;
+		 var superadmin = 0;
+		 var apiaccess = 0;
+		 var portelaccess = 0;
+		 if(data.superadmin === 1 && data.apiaccess === 0 && data.portelaccess === 0){
+			level = 300;		  		  
+			superadmin = 1;		
+			apiaccess = 1;
+			portelaccess = 1;
+		 }else if(data.superadmin === 0 && data.apiaccess === 1 && data.portelaccess === 0){
+			level = 290;		  		  
+			superadmin = 0;		
+			apiaccess = 1;
+			portelaccess = 1;
+		 }else if(data.superadmin === 0 && data.apiaccess === 0 && data.portelaccess === 1){
+			level = 280;			  		  
+			superadmin = 0;		
+			apiaccess = 0;
+			portelaccess = 1;
+		 }else {
+			level = 300;	
+			superadmin = 1;		
+			apiaccess = 1;
+			portelaccess = 1;			  
+		 }
        var userParams = {
             TableName: "users",
             Key: {
                 user_cognito_id: data.data.cognito_id,
             },
             UpdateExpression:
-                "set superadmin = :superadmin, apiaccess = :apiaccess, portelaccess = :portelaccess",
+                "set superadmin = :superadmin, apiaccess = :apiaccess, portelaccess = :portelaccess, #userlevel = :userlevelvalue",
+			ExpressionAttributeNames: {
+               "#userlevel": "level",
+            },
             ExpressionAttributeValues: {
-                ":superadmin": data.superadmin,
-                ":apiaccess": data.apiaccess,
-                ":portelaccess": data.portelaccess,
+                ":superadmin": superadmin,
+                ":apiaccess": apiaccess,
+                ":portelaccess": portelaccess,
+                ":userlevelvalue": level,
             },
             ReturnValues: "UPDATED_NEW",
         };
+		
+		console.log("userParams",userParams);
         docClient.update(userParams, (err, data) => {
             if (err) {
+		console.log("userParams err",err);
                 reject(err);
             } else {
+		console.log("userParams data",data);
                 resolve(data);
             }
         });
