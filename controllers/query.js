@@ -1698,6 +1698,65 @@ function getOrganizationTeamData(obj) {
     });
 }
 
+function getOrganizationTeamData_V2(obj) {
+    return new Promise((resolve, reject) => {
+        const player_obj = {};
+        player_obj.organization = obj.organization;
+        player_obj.team_name = obj.team;
+        if (obj.sensor) {
+            player_obj.sensor = obj.sensor;
+        }
+        getOrganizationData(player_obj)
+            .then (org => {
+                if (org.length > 0) {
+                    let params;
+                    if (obj.sensor) {
+                        params = {
+                            TableName: "sensor_details",
+                            // KeyConditionExpression:  "org_id = :org_id",
+                            FilterExpression: "organization = :organization and team = :team",
+                            ExpressionAttributeValues: {
+                                // ":org_id": org[0].organization_id,
+                              //  ":sensor": obj.sensor,
+                                ":organization": obj.organization,
+                                ":team": obj.team
+                            },
+                            ProjectionExpression: "player_id, image_id",
+                            ScanIndexForward: false
+                        };
+                    } else {
+                        params = {
+                            TableName: "sensor_details",
+                            // KeyConditionExpression: "org_id = :org_id",
+                            FilterExpression: "organization = :organization and team = :team",
+                            ExpressionAttributeValues: {
+                                // ":org_id": org[0].organization_id,
+                                ":organization": obj.organization,
+                                ":team": obj.team
+                            },
+                            ProjectionExpression: "player_id, image_id",
+                            ScanIndexForward: false
+                        };
+                    }
+                    var item = [];
+                    docClient.scan(params).eachPage((err, data, done) => {
+                        if (err) {
+                            console.log('err',err)
+                            reject(err);
+                        }
+                        if (data == null) {
+                            resolve(concatArrays(item));
+                        } else {
+                            item.push(data.Items);
+                        }
+                        done();
+                    });
+                } else {
+                    resolve([]);
+                }
+            })
+    });
+}
 function getPlayerSimulationFile(obj) {
     // console.log('obj.image_id',obj.image_id)
     return new Promise((resolve, reject) => {
@@ -1734,6 +1793,26 @@ function getPlayerSimulationStatus(image_id) {
         });
     });
 }
+
+function getPlayerSimulationStatus_v2(image_id) {
+    return new Promise((resolve, reject) => {
+        let params = {
+            TableName: "simulation_images",
+            Key: {
+                image_id: image_id,
+            },
+            ProjectionExpression: "computed_time,status"
+        };
+        docClient.get(params, function (err, data) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data.Item);
+            }
+        });
+    });
+}
+
 
 function getSensorAdmins(sensor) {
     return new Promise((resolve, reject) => {
@@ -3328,6 +3407,46 @@ function getBrandOrganizationData2(obj) {
     });
 }
 
+function getBrandOrganizationCount(obj) {
+    return new Promise((resolve, reject) => {
+        let params = '';
+        if(obj.sensor && obj.sensor != null){
+            params = {
+                TableName: "sensor_details",
+                FilterExpression: "organization = :organization",
+                ExpressionAttributeValues: {
+                  //  ":sensor": obj.sensor,
+                    ":organization": obj.organization
+                },
+                ProjectionExpression: "image_id,player_id"
+            };
+        }else{
+            params = {
+                TableName: "sensor_details",
+                FilterExpression: "organization = :organization",
+                ExpressionAttributeValues: {
+                   ":organization": obj.organization
+                },
+                ProjectionExpression: "image_id,player_id"
+            };
+        }
+       
+        var item = [];
+        docClient.scan(params).eachPage((err, data, done) => {
+            if (err) {
+                reject(err);
+            }
+            if (data == null) {
+                resolve(concatArrays(item));
+            } else {
+                item.push(data.Items);
+            }
+            done();
+        });
+    });
+}
+
+
 function getAllOrganizationsOfSensorBrand(obj) {
     return new Promise((resolve, reject) => {
         let params = {
@@ -4109,4 +4228,7 @@ module.exports = {
 	InsertNewSensorDataByPlayerID,
 	DeleteSensorDataByPlayerID,
 	updateuseraccess,
+    getBrandOrganizationCount,
+    getPlayerSimulationStatus_v2,
+    getOrganizationTeamData_V2
 };

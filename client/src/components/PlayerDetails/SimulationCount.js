@@ -14,29 +14,31 @@ class SimulationCount extends React.Component {
   }
 
 
-  componentDidMount() {
-    const {count, sensor, organization } = this.props;
+  componentWillReceiveProps (){
+    const {count, sensor, organization,isloadCount } = this.props;
+    console.log('isloadCount -----------------',isloadCount, count)
     if( count || count === '0' || count === 0){
 
     }else{
-      getAllOrganizationsSimultionCount({sensor,organization})
-      .then(res =>{
-        console.log('res ---',res);
-        if(res.data.message === "success"){
-          this.setState({simulationCount: res.data.count});
-          this.props.setSimulationCount( res.data.count, organization,res.data.simulation_status, res.data.computed_time, res.data.simulation_timestamp);
-        }else{
+      if(isloadCount === 1){
+        getAllOrganizationsSimultionCount({sensor,organization})
+        .then(res =>{
+          console.log('res ---',res);
+          if(res.data.message === "success"){
+            this.setState({simulationCount: res.data.count});
+            this.props.setSimulationCount( res.data.count, organization,res.data.simulation_status, res.data.computed_time, res.data.simulation_timestamp);
+          }else{
+            this.setState({simulationCount: 0});
+            this.props.setSimulationCount(0, organization, '','','');
+
+          }
+        }).catch(err=>{
+          console.log('err',err);
           this.setState({simulationCount: 0});
-          this.props.setSimulationCount(0, organization, '','','');
-
-        }
-      }).catch(err=>{
-        console.log('err',err);
-        this.setState({simulationCount: 0});
-        this.props.setSimulationCount(0, organization,'','','');
-      })
+          this.props.setSimulationCount(0, organization,'','','');
+        })
+      }
     }
-
   }
 
 
