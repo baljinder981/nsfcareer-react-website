@@ -592,21 +592,24 @@ class TeamnAdmin extends React.Component {
 
     setTeamSimulationCount= (count, team,simulation_status, computed_time, simulation_timestamp)=>{
         let lsitOrg = this.state.sensorOrgTeamList;
-        console.log('count',count, team)
         for (let i = 0; i < this.state.totalTeam; i++) {
             if(lsitOrg[i].team_name === team){
+				if (lsitOrg[i + 1]) lsitOrg[i + 1].isloadCount = 1;
+                lsitOrg[i].isloadCount = 2;
                 lsitOrg[i].simulation_count =  count;
                 lsitOrg[i].simulation_status =  simulation_status;
                 lsitOrg[i].computed_time =  computed_time;
                 lsitOrg[i].simulation_timestamp =  simulation_timestamp;
+				break;
             }
 
         }
 
         this.setState({sensorOrgTeamList: lsitOrg});
+		this.iterateTeam();
     }
 
-    smallCards = (simulation_status, computed_time, simulation_timestamp, reference, brand, organization, team, user_cognito_id, noOfSimulation, key, organization_id) => {
+    smallCards = (simulation_status, computed_time, simulation_timestamp, reference, brand, organization, team, user_cognito_id, noOfSimulation, key, organization_id, isloadCount) => {
 
 
         // console.log(reference);
@@ -666,7 +669,7 @@ class TeamnAdmin extends React.Component {
                         </div>
                         <div className="football-body d-flex">
                             <div ref={reference[4]} className="body-left-part org-team-team-card" style={{ width: "100%", borderRight: "none" }}>
-                                <TeamSimulationCount count={noOfSimulation} sensor={brand} organization={organization} team={team} setSimulationCount={this.setTeamSimulationCount}/>
+                                <TeamSimulationCount count={noOfSimulation} sensor={brand} organization={organization} team={team} setSimulationCount={this.setTeamSimulationCount}  isloadCount={isloadCount}/>
                                 
                                 <p className="teamImpact" ref={reference[5]}>
                                     Simulations
@@ -691,7 +694,14 @@ class TeamnAdmin extends React.Component {
         let inc = 1;
         var cards = new Array(this.state.totalTeam);
         // let j = 1;
+		
+        console.log('totalTeam',this.state.totalTeam)
         for (let i = 0; i < this.state.totalTeam; i++) {
+				
+		var isloadCount = 0;
+		if (!this.state.sensorOrgTeamList[i].isloadCount && i === 0) {
+			isloadCount = 1;
+		}
             cards[i] = this.smallCards(
                 this.state.sensorOrgTeamList[i].simulation_status,
                 this.state.sensorOrgTeamList[i].computed_time,
@@ -713,6 +723,7 @@ class TeamnAdmin extends React.Component {
                 Number(this.state.sensorOrgTeamList[i].simulation_count),
                 i,
                 this.state.sensorOrgTeamList[i].organization_id,
+                this.state.sensorOrgTeamList[i].isloadCount ? this.state.sensorOrgTeamList[i].isloadCount : isloadCount
 
             );
             // j++;
@@ -749,6 +760,10 @@ class TeamnAdmin extends React.Component {
                     }
                 }
                 var sensor = team.sensor && team.sensor !== null ? team.sensor : ''; 
+				var isloadCount = 0;
+				if (!team.isloadCount && index === 0) {
+					isloadCount = 1;
+				}
                 return <tr className={cls} key={index}   >
                     <th style={{ verticalAlign: "middle" }} scope="row">{Number(index + 1)}</th>
                     <td><span onClick={() => {
@@ -767,7 +782,7 @@ class TeamnAdmin extends React.Component {
 
                 }} >{team.team_name ? team.team_name : 'NA'} </span> </td>
                     
-                    <td><TeamSimulationCountForList count={team.simulation_count} sensor={team.sensor} organization={team.organization} team={team.team_name} setSimulationCount={this.setTeamSimulationCount}/></td>
+                    <td><TeamSimulationCountForList count={team.simulation_count} sensor={team.sensor} organization={team.organization} team={team.team_name} setSimulationCount={this.setTeamSimulationCount}  isloadCount={isloadCount}/></td>
                     <td>{team.organization}</td>
                     {this.state.isEdit ?	
 						<>

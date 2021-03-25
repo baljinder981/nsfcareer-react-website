@@ -1,3 +1,4 @@
+
 import React from 'react';
 import RostarBtn from './Buttons/RostarBtn';
 import Footer from './Footer';
@@ -244,7 +245,6 @@ class AdminDashboard extends React.Component {
     /*===================================
     
         Organization edit funtion start here
-
     =============================================*/
     handleEdit = (e) => {
         console.log('edit')
@@ -1135,7 +1135,7 @@ class AdminDashboard extends React.Component {
                         </div>
                         <div className="football-body d-flex">
                             <div ref={reference[4]} className="body-left-part org-team-team-card" style={{ width: "100%", borderRight: "none" }}>
-                                {/* <SimulationCount count={noOfSimulation} sensor={brand} organization={organization} setSimulationCount={this.setSimulationCount} isloadCount={isloadCount}/> */}
+                                <SimulationCount count={noOfSimulation} key={key} sensor={brand} organization={organization} setSimulationCount={this.setSimulationCount} isloadCount={isloadCount}/> 
 
                                 <p className="teamImpact" ref={reference[5]}>
                                     Simulations
@@ -1187,7 +1187,6 @@ class AdminDashboard extends React.Component {
 
     setTeamSimulationCount = (count, team, simulation_status, computed_time, simulation_timestamp, organization) => {
         let lsitOrg = this.state.teamList;
-        console.log('count', count, team)
         for (let i = 0; i < this.state.totalTeam; i++) {
             if (lsitOrg[i].team_name === team && lsitOrg[i].organization === organization) {
                 lsitOrg[i].simulation_count = count;
@@ -1540,9 +1539,9 @@ class AdminDashboard extends React.Component {
                 lsitOrg[i].simulation_status = simulation_status;
                 lsitOrg[i].computed_time = computed_time;
                 lsitOrg[i].simulation_timestamp = simulation_timestamp;
-                lsitOrg[i].isloadCount = 2;
                 if (lsitOrg[i + 1]) lsitOrg[i + 1].isloadCount = 1;
-
+                lsitOrg[i].isloadCount = 2;
+				break;
             }
 
         }

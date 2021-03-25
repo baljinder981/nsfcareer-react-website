@@ -14,7 +14,7 @@ import trangle_red from './trangle_red.png';
 import arrow_left from './arrow_left.png'
 import arrow_right from './arrow_right.png'
 
-import ClinicalReportHeader from './Clinical-Report-Header.png';
+import ClinicalReportHeader from './Clinical-Report-Header-Combined.png';
 import taxture1  from './taxture1.png';
 import branImages_1 from './branImages_1.png';
 import brainimage_2 from './brainimage_2.png';
@@ -997,7 +997,8 @@ class Report extends React.Component {
 
                         <View style={styles.tableRow}>
                             <Text style={styles.tableColLeft}> DOB : <Text style={{color:'#2d549a'}}>{this.state.jsonData['playerdata'] ?this.state.jsonData['playerdata'].dob:"N/A"} </Text></Text>
-                            <Text style={styles.tableColLeftfull}> Impact Date: <Text style={{color:'#2d549a'}}>{this.state.impact_date}</Text></Text>
+                            <Text style={styles.tableColLeft}> Impact Date: <Text style={{color:'#2d549a'}}>{this.state.impact_date}</Text></Text>
+                            <Text style={styles.tableColRight}> Team: <Text style={{color:'#2d549a'}}>{this.state.jsonData['playerdata'] ?this.state.jsonData['playerdata'].team:"N/A"}</Text></Text>
                         </View>
                         <View style={styles.tableRow}>
 

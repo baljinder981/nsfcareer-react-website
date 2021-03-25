@@ -9,21 +9,19 @@ class SimulationCount extends React.Component {
 
     this.state = {
       isLoaded: false,
-      simulationCount: ''
+      simulationCount: '',
     }
   }
 
 
   componentWillReceiveProps (){
-    const {count, sensor, organization,isloadCount } = this.props;
-    console.log('isloadCount -----------------',isloadCount, count)
+    const {count, sensor, organization,isloadCount } = this.props;	
     if( count || count === '0' || count === 0){
-
     }else{
       if(isloadCount === 1){
+		console.log("isloadCount", isloadCount);
         getAllOrganizationsSimultionCount({sensor,organization})
         .then(res =>{
-          console.log('res ---',res);
           if(res.data.message === "success"){
             this.setState({simulationCount: res.data.count});
             this.props.setSimulationCount( res.data.count, organization,res.data.simulation_status, res.data.computed_time, res.data.simulation_timestamp);

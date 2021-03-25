@@ -505,7 +505,7 @@ class OrganizationAdmin extends React.Component {
 
     };
   
-    smallCards = (organization_id,simulation_status, computed_time, simulation_timestamp, reference, brand, organization, user_cognito_id, noOfSimulation, key) => {
+    smallCards = (organization_id,simulation_status, computed_time, simulation_timestamp, reference, brand, organization, user_cognito_id, noOfSimulation, key, isloadCount) => {
         console.log('organization_id',organization_id);
         let cls = simulation_status === 'pending' ? 'pendingSimulation tech-football m-3' : 'tech-football m-3';
         if (simulation_status === 'completed') {
@@ -522,6 +522,7 @@ class OrganizationAdmin extends React.Component {
                 cls = 'completedSimulation tech-football m-3';
             }
         }
+		console.log("isloadCount",isloadCount);
         return (
             <div key={key} ref={''} className={this.state.editTeamClass}>
                 <ul className="organization-edit-icons isEdit">
@@ -560,7 +561,7 @@ class OrganizationAdmin extends React.Component {
                         </div>
                         <div className="football-body d-flex">
                             <div ref={reference[4]} className="body-left-part org-team-team-card" style={{ width: "100%", borderRight: "none" }}>
-                                <SimulationCount count={noOfSimulation} sensor={brand} organization={organization} setSimulationCount={this.setSimulationCount}/>
+                                <SimulationCount count={noOfSimulation} sensor={brand} organization={organization} setSimulationCount={this.setSimulationCount}  isloadCount={isloadCount}/>
                                 {/*noOfSimulation || noOfSimulation === '0' || noOfSimulation === 0 ? 
                                     <p style={{ fontSize: "50px" }}>{noOfSimulation} </p>
                                  : 
@@ -605,7 +606,11 @@ class OrganizationAdmin extends React.Component {
                             cls = 'completedSimulation tech-football m-3';
                         }
                     }
-
+					
+						var isloadCount = 0;
+						if (!organization.isloadCount && index === 0) {
+							isloadCount = 1;
+						}
                     return <tr className={cls}  key={index} 
                     >
                         <th style={{ verticalAlign: "middle" }} scope="row">{Number(index + 1)}</th>
@@ -622,7 +627,7 @@ class OrganizationAdmin extends React.Component {
                         })
                     }}>{organization.organization}</td>
                         <td>{organization.sensor ? organization.sensor : 'NA'}</td>
-                        <td><SimulationCountForList count={organization.simulation_count } sensor={organization.sensor} organization={organization.organization} setSimulationCount={this.setSimulationCount}/></td>
+                        <td><SimulationCountForList count={organization.simulation_count } sensor={organization.sensor} organization={organization.organization} setSimulationCount={this.setSimulationCount} isloadCount={isloadCount}/></td>
 						{this.state.isEdit ?	
 						<>	
 						<td style={{width :'20%'}}>
@@ -655,11 +660,14 @@ class OrganizationAdmin extends React.Component {
                 lsitOrg[i].simulation_status = simulation_status; 
                 lsitOrg[i].computed_time = computed_time;
                 lsitOrg[i].simulation_timestamp = simulation_timestamp;
+				if (lsitOrg[i + 1]) lsitOrg[i + 1].isloadCount = 1;
+                lsitOrg[i].isloadCount = 2;
+				break;
             }
 
         }
-
         this.setState({sensorOrgList: lsitOrg});
+		this.iterateTeam();
     }
 
     iterateTeam = () => {
@@ -669,6 +677,11 @@ class OrganizationAdmin extends React.Component {
         console.log('cards',cards)
         // let j = 1;
         for (let i = 0; i < this.state.totalOrganization; i++) {
+			
+		var isloadCount = 0;
+		if (!this.state.sensorOrgList[i].isloadCount && i === 0) {
+			isloadCount = 1;
+		}
             cards[i] = this.smallCards(
                 this.state.sensorOrgList[i].organization_id,
                 this.state.sensorOrgList[i].simulation_status,
@@ -686,8 +699,9 @@ class OrganizationAdmin extends React.Component {
                 this.props.location.state.brand.brand,
                 this.state.sensorOrgList[i].organization,
                 this.props.location.state.brand.user_cognito_id,
-                Number(this.state.sensorOrgList[i].simulation_count),
-                i
+                Number(this.state.sensorOrgList[i].simulation_count),	
+				i,			
+                this.state.sensorOrgList[i].isloadCount ? this.state.sensorOrgList[i].isloadCount : isloadCount
             );
             // j++;
         }

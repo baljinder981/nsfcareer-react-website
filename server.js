@@ -10738,11 +10738,9 @@ app.post(`${apiPrefix}getAllOrganizationsOfSensorBrand`, (req, res) => {
 
 
 app.post(`${apiPrefix}getAllOrganizationsSimultionCount`, (req, res) => {
-    console.log('count ', req.body)
-
-    getBrandOrganizationCount(req.body)
+			console.log("req.body",req.body)
+	getBrandOrganizationCount(req.body)
         .then(simulation_records => {
-            console.log('simulation_records ', simulation_records)
             var count = Number(simulation_records.length).toString();
             simulation_records.forEach(function (simulation_record, index) {
                 simulation_record['date_time'] = simulation_record.player_id.split('$')[1];
@@ -10755,7 +10753,8 @@ app.post(`${apiPrefix}getAllOrganizationsSimultionCount`, (req, res) => {
                 if (keyA > keyB) return 1;
                 return 0;
             });
-
+			console.log("simulation_records",simulation_records)
+			console.log("image_id",simulation_records[0].image_id)
             getPlayerSimulationStatus_v2(simulation_records[0].image_id)
                 .then(simulation => {
                     var simulation_status = simulation ? simulation.status : '';
@@ -10770,7 +10769,7 @@ app.post(`${apiPrefix}getAllOrganizationsSimultionCount`, (req, res) => {
                     })
                 }).catch(err => {
                     res.send({
-                        message: "failure",
+                        message: err,
                         count: 0,
                         simulation_status: '',
                         computed_time: '',
@@ -10902,6 +10901,7 @@ app.post(`${apiPrefix}getAllteamsOfOrganizationOfSensorBrand`, (req, res) => {
 })
 
 app.post(`${apiPrefix}getTeamSimultionCount`, (req, res) => {
+	console.log("req",req.body);  
     getOrganizationTeamData_V2({ sensor: req.body.sensor, organization: req.body.organization, team: req.body.team })
         .then(simulation_records => {
             var count = Number(simulation_records.length).toString();

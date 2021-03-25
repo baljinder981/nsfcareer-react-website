@@ -52,6 +52,12 @@
     color: #000000 !important;
     text-align: center;
 }
+.completedSimulation.player-data-table-row td {
+    color: #fff;
+}
+.completedSimulation.player-data-table-row th {
+    color: #fff;
+}
 .player-dashboard-user-datials-header p {
   text-align: left !important;
 }

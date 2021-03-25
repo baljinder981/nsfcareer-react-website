@@ -1706,9 +1706,11 @@ function getOrganizationTeamData_V2(obj) {
         if (obj.sensor) {
             player_obj.sensor = obj.sensor;
         }
-        getOrganizationData(player_obj)
+		console.log("player_obj",player_obj);
+       /* getOrganizationData(player_obj)
             .then (org => {
-                if (org.length > 0) {
+		console.log("player_obj",player_obj);
+                if (org.length > 0) {*/
                     let params;
                     if (obj.sensor) {
                         params = {
@@ -1751,10 +1753,10 @@ function getOrganizationTeamData_V2(obj) {
                         }
                         done();
                     });
-                } else {
+               /* } else {
                     resolve([]);
-                }
-            })
+                } 
+            })*/
     });
 }
 function getPlayerSimulationFile(obj) {
@@ -1801,7 +1803,10 @@ function getPlayerSimulationStatus_v2(image_id) {
             Key: {
                 image_id: image_id,
             },
-            ProjectionExpression: "computed_time,status"
+            ProjectionExpression: "computed_time,#_status",
+			ExpressionAttributeNames: {
+			"#_status": 'status',
+			},
         };
         docClient.get(params, function (err, data) {
             if (err) {

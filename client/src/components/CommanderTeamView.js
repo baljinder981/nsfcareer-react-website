@@ -1,11 +1,8 @@
 import React from 'react';
 import RostarBtn from './Buttons/RostarBtn';
 import { Redirect, Link } from 'react-router-dom'
-
 import Footer from './Footer';
-//import PenstateUniversity from './PenstateUniversity';
 import { getStatusOfDarkmode } from '../reducer';
-// import DarkMode from './DarkMode';
 import SideBar from './SideBar';
 import { connect } from 'react-redux';
 import BrainSubmitPortal from './brainComponent/brainSubmitPortal';
@@ -255,7 +252,6 @@ class CommanderTeamView extends React.Component {
                                             .then(response => {
                                                 console.log('getPlayersData ----------------------\n', response);
                                                 for (var i = 0; i < response.data.data.length; i++) {
-                                                    // eslint-disable-next-line
                                                     this.setState(prevState => ({
                                                         users: [...prevState.users, response.data.data[i]],
                                                         isLoaded: true
@@ -264,9 +260,7 @@ class CommanderTeamView extends React.Component {
                                                 if (response.data.data.length > 4) {
                                                     this.setState({ isMobile: false });
                                                 }
-                                                // eslint-disable-next-line
                                                 for (var i = 0; i < response.data.requested_players.length; i++) {
-                                                    // eslint-disable-next-line
                                                     this.setState(prevState => ({
                                                         requestedUsers: [...prevState.requestedUsers, response.data.requested_players[i]],
                                                         isLoaded: true
