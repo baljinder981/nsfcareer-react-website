@@ -1825,7 +1825,9 @@ app.get(`${apiPrefix}img/:url?`, (req, res) => {
     }
 })
 
-
+app.get(`${apiPrefix}migratesensordatatomongo`, (req, res) => {
+	console.log("data migrated");
+})  
 
 
 /*================ ======================================
@@ -15036,6 +15038,8 @@ app.post(`${apiPrefix}updateuseraccess`, (req, res) => {
             })
         })
 })
+// update user access
+
 const port = process.env.PORT || 3001;
 // Configuring port for APP
 server.listen(port, () => console.log(`Listening on port ${port}`))
