@@ -79,7 +79,7 @@ function getUserDetailByPlayerId(sensor_id_number) {
                 ":player_id": sensor_id_number
             }
         };
-        
+        console.log("params",params);
         var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
             if (err) {
@@ -515,7 +515,8 @@ function getTeamDataWithPlayerRecords(obj) {
                 if (org.length > 0) {
                     let params;
                     if (obj.sensor && obj.sensor != 'null') {
-                        params = {
+						params = {org_id : org[0].organization_id,sensor:obj.sensor,organization : obj.organization , team :obj.team,player_id :   {$regex: obj.player_id, $options: 'i'}}
+                    /*    params = {
                             TableName: "sensor_details",
                             KeyConditionExpression:  "org_id = :org_id and begins_with(player_id,:player_id)",
                             FilterExpression: "sensor = :sensor and organization = :organization and team = :team",
@@ -535,8 +536,11 @@ function getTeamDataWithPlayerRecords(obj) {
                             ProjectionExpression: " #time, #date,#Impact_date,#Impact_time, image_id,organization,player,player_id,sensor,simulation_status,team,user_cognito_id",
                             ScanIndexForward: false
                         };
-                    } else {
-                        params = {
+*/                  
+				  } else {
+					  
+						params = {org_id : org[0].organization_id,organization : obj.organization , team :obj.team,player_id : {$regex: obj.player_id, $options: 'i'}}
+                   /*     params = {
                             TableName: "sensor_details",
                             KeyConditionExpression:  "org_id = :org_id and begins_with(player_id,:player_id)",
                             FilterExpression: "organization = :organization and team = :team",
@@ -555,8 +559,21 @@ function getTeamDataWithPlayerRecords(obj) {
                             ProjectionExpression: " #time, #date,#Impact_date,#Impact_time, image_id,organization,player,player_id,sensor,simulation_status,team,user_cognito_id",
                             ScanIndexForward: false
                         };
-                    }
-                    var item = [];
+                  */
+				  }
+				  const sensorDetails = require("../models/sensors/sensorDetailsData");		
+						var item = [];
+						sensorDetails.find(params, function (err, details) {
+							if (err) {
+								reject(err);
+							}
+							if (details == null) {
+								resolve([]);
+							} else {
+								resolve(details);
+							}
+						}); 
+                   /* var item = [];
                     docClient.query(params).eachPage((err, data, done) => {
                         if (err) {
                             reject(err);
@@ -567,7 +584,7 @@ function getTeamDataWithPlayerRecords(obj) {
                             item.push(data.Items);
                         }
                         done();
-                    });
+                    }); */
                 } else {
                     resolve([]);
                 }
@@ -588,6 +605,7 @@ function getTeamDataWithPlayerRecords_3(player_id, team, sensor, organization) {
                 if (org.length > 0) {
                     let params;
                     if (sensor && sensor != 'null') {
+						 /*params = {org_id : org[0].organization_id,sensor : sensor ,organization : organization , team :team,player_id : {$regex: player_id, $options: 'i'}} */
                         params = {
                             TableName: "sensor_details",
                             KeyConditionExpression:  "org_id = :org_id and begins_with(player_id,:player_id)",
@@ -609,7 +627,8 @@ function getTeamDataWithPlayerRecords_3(player_id, team, sensor, organization) {
                             ScanIndexForward: false
                         };
                     } else {
-                        params = {
+						 /* params = {org_id : org[0].organization_id,organization : organization , team :team,player_id :  {$regex: player_id, $options: 'i'}} */
+                         params = {
                             TableName: "sensor_details",
                             KeyConditionExpression:  "org_id = :org_id and begins_with(player_id,:player_id)",
                             FilterExpression: "organization = :organization and team = :team",
@@ -627,8 +646,21 @@ function getTeamDataWithPlayerRecords_3(player_id, team, sensor, organization) {
                             },
                             ProjectionExpression: " #time,#date,#Impact_date,#Impact_time,image_id,organization,player,player_id,sensor,simulation_status,team,user_cognito_id",
                             ScanIndexForward: false
-                        };
+                        }; 
                     }
+					/*
+				  const sensorDetails = require("../models/sensors/sensorDetailsData");		
+						var item = [];
+						sensorDetails.find(params).sort({'_id': 1}).exec((err, details) => {
+							if (err) {
+								reject(err);
+							}
+							if (details == null) {
+								resolve([]);
+							} else {
+								resolve(details);
+							}
+						});  */
                     var item = [];
                     docClient.query(params).eachPage((err, data, done) => {
                         if (err) {
@@ -640,7 +672,7 @@ function getTeamDataWithPlayerRecords_3(player_id, team, sensor, organization) {
                             item.push(data.Items);
                         }
                         done();
-                    });
+                    }); 
                 } else {
                     resolve([]);
                 }
@@ -1382,35 +1414,20 @@ function getAllSensorBrands() {
 
 function getBrandData(obj) {
     return new Promise((resolve, reject) => {
+       const sensorDetails = require("../models/sensors/sensorDetailsData");		
+			var item = [];
+			sensorDetails.find({ sensor: obj.sensor }, function (err, details) {
+				if (err) {
+					reject(err);
+				}
+				if (details == null) {
+					 resolve([]);
+				} else {
+					resolve(details);
+				}
+			}); 
 
-        // var users = obj.users;
-        // var userObject = {};
-        // var index = 0;
-        // users.forEach(function(value) {
-        //     index++;
-        //     var userKey = ":uservalue"+index;
-        //     userObject[userKey.toString()] = value;
-        // });
-
-        // let params = {
-        //     TableName: "sensor_details",
-        //     FilterExpression: "user_cognito_id IN (" + Object.keys(userObject).toString() + ")",
-        //     ExpressionAttributeValues: userObject
-        // };
-        // var item = [];
-        // docClient.scan(params).eachPage((err, data, done) => {
-        //     if (err) {
-        //         reject(err);
-        //     }
-        //     if (data == null) {
-        //         resolve(concatArrays(item));
-        //     } else {
-        //         item.push(data.Items);
-        //     }
-        //     done();
-        // });
-
-        let params = {
+       /* let params = {
             TableName: "sensor_details",
             FilterExpression: "sensor = :sensor",
             ExpressionAttributeValues: {
@@ -1429,7 +1446,7 @@ function getBrandData(obj) {
                 item.push(data.Items);
             }
             done();
-        });
+        }); */
     });
 }
 function getSensorDataByPlayerID(player_id) {
@@ -1707,11 +1724,24 @@ function getOrganizationTeamData_V2(obj) {
             player_obj.sensor = obj.sensor;
         }
 		console.log("player_obj",player_obj);
+		const sensorDetails = require("../models/sensors/sensorDetailsData");		
+			var item = [];
+			sensorDetails.find({ organization: obj.organization, team :obj.team }).count(function(err, count){
+				if (err) {
+					reject(err);
+				}
+				if (count == null) {
+					 resolve([]);
+					
+				} else {
+					resolve(count);
+				}
+			}); 
        /* getOrganizationData(player_obj)
             .then (org => {
 		console.log("player_obj",player_obj);
                 if (org.length > 0) {*/
-                    let params;
+                   /* let params;
                     if (obj.sensor) {
                         params = {
                             TableName: "sensor_details",
@@ -1752,7 +1782,7 @@ function getOrganizationTeamData_V2(obj) {
                             item.push(data.Items);
                         }
                         done();
-                    });
+                    }); */
                /* } else {
                     resolve([]);
                 } 
@@ -2091,7 +2121,7 @@ function getUserSensor(user_name) {
 function getOrganizationList() {
     return new Promise((resolve, reject) => {
         var params = {
-            TableName: 'organizations',
+            TableName: 'organizations'
         };
         var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
@@ -2101,6 +2131,27 @@ function getOrganizationList() {
             if (data == null) {
                 resolve(concatArrays(item));
             } else {
+                item.push(data.Items);
+            }
+            done();
+        });
+    });
+}
+function getallsensordetails() {
+    return new Promise((resolve, reject) => {
+        var params = {
+            TableName: 'sensor_details'
+        };
+		console.log("params",params);
+        var item = [];
+        docClient.scan(params).eachPage((err, data, done) => {
+            if (err) {
+                reject(err);
+            }
+            if (data == null) {
+                resolve(concatArrays(item));
+            } else {
+				console.log("data.Items",data.Items);
                 item.push(data.Items);
             }
             done();
@@ -3310,9 +3361,10 @@ function getTeamDataWithPlayerRecords_2(obj) {
         console.log(obj.sensor, obj.organization, obj.team, obj.player_id)
         getOrganizationData(player_obj)
             .then (org => {
+				console.log("org",org);
                 if (org.length > 0) {
                     let params;
-                    if (obj.sensor) {
+                    /*if (obj.sensor) {
                         params = {
                             TableName: "sensor_details",
                             // KeyConditionExpression:  "org_id = :org_id and begins_with(player_id,:player_id)",
@@ -3365,7 +3417,7 @@ function getTeamDataWithPlayerRecords_2(obj) {
                             item.push(data.Items);
                         }
                         done();
-                    });
+                    });  */
                 } else {
                     resolve([]);
                 }
@@ -3415,7 +3467,20 @@ function getBrandOrganizationData2(obj) {
 function getBrandOrganizationCount(obj) {
     return new Promise((resolve, reject) => {
         let params = '';
-        if(obj.sensor && obj.sensor != null){
+		const sensorDetails = require("../models/sensors/sensorDetailsData");		
+			var item = [];
+			sensorDetails.find({ organization: obj.organization }).count(function(err, count) {
+				if (err) {
+					reject(err);
+				}
+				if (count == null) {
+					 resolve([]);
+					
+				} else {
+					resolve(count);
+				}
+			}); 
+       /* if(obj.sensor && obj.sensor != null){
             params = {
                 TableName: "sensor_details",
                 FilterExpression: "organization = :organization",
@@ -3447,7 +3512,7 @@ function getBrandOrganizationCount(obj) {
                 item.push(data.Items);
             }
             done();
-        });
+        });*/
     });
 }
 
@@ -4235,5 +4300,6 @@ module.exports = {
 	updateuseraccess,
     getBrandOrganizationCount,
     getPlayerSimulationStatus_v2,
-    getOrganizationTeamData_V2
+    getOrganizationTeamData_V2,
+	getallsensordetails
 };

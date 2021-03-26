@@ -32,7 +32,7 @@ let ejs = require("ejs");
 let pdf = require("html-pdf");
 let csvjson = require('csvjson');
 const csvparser = require("csvtojson");
-
+var db_connection  = require('./middlewares/dbConnection')
 
 app.use(express.static(path.resolve('./public')));
 // var transporter = nodemailer.createTransport({
@@ -240,7 +240,8 @@ const {
     updateuseraccess,
     getBrandOrganizationCount,
     getPlayerSimulationStatus_v2,
-    getOrganizationTeamData_V2
+    getOrganizationTeamData_V2,
+	getallsensordetails
 } = require('./controllers/query');
 
 // Multer Configuration 
@@ -1824,11 +1825,52 @@ app.get(`${apiPrefix}img/:url?`, (req, res) => {
         res.end();
     }
 })
-
+/*  Migration API Start
 app.get(`${apiPrefix}migratesensordatatomongo`, (req, res) => {
-	console.log("data migrated");
+			console.log("Migration")
+    const sensorDetails = require("./models/sensors/sensorDetailsData");
+	/* sensorDetails.find().count(function(err, count){
+		console.log("Number of docs: ", count );
+		if (count) res.send(count);
+		else res.send(err);
+	});  *//*
+	getallsensordetails()
+	.then(sensors => {
+		var count = 0;
+		var sensorlen = sensors.length;
+		console.log("sensorlen",sensorlen)
+		sensors.forEach(async function (record, index) {
+			count++;
+			var sensor = new sensorDetails(
+				{
+					org_id: record.org_id,
+					player_id: record.player_id,
+					image_id: record.image_id,
+					'impact-date': record['impact-date'],
+					'impact-time': record['impact-time'],
+					level: record.level,
+					organization: record.organization,
+					player: record.player,
+					simulation: record.simulation,
+					simulation_status: record.simulation_status,
+					team: record.team,
+					sensor: record.sensor,
+					user_cognito_id: record.user_cognito_id
+				}
+			);
+			sensor.save(function (err) {
+				if (err) {					
+					console.log("sensorlen",err)
+				}
+				else {
+					console.log("record",record)
+				}
+			});	
+        })
+	});	
 })  
-
+*/
+/* End MIgration API */ 
 
 /*================ ======================================
         
@@ -4410,6 +4452,9 @@ app.post(`${apiPrefix}getPlayerList`, (req, res) => {
             var indx = 0;
             var p_data = [];
             var player_listLn = player_list.length;
+			
+			console.log("player_list",player_list);
+			
             player_list.forEach(function (player, index) {
                 let p = player;
                 let playerData = '';
@@ -4417,7 +4462,6 @@ app.post(`${apiPrefix}getPlayerList`, (req, res) => {
                 if (player.player_id && player.player_id != 'undefined') {
                     getTeamDataWithPlayerRecords_3(player.player_id, player.team, player.sensor, player.organization)
                         .then(player_data => {
-
                             playerData = player_data;
                             counter++;
                             p_data.push({
@@ -4448,12 +4492,12 @@ app.post(`${apiPrefix}getPlayerList`, (req, res) => {
                                                 getUserDetailByPlayerId(record.simulation_data[0].player_id.split('$')[0])
                                                     .then(u_detail => {
                                                         k++;
-                                                        // console.log('user details ', u_detail[0]['first_name'])
+                                                        console.log('user details ', u_detail)
                                                         p_data[index]['simulation_data'][0]['user_data'] = u_detail.length > 0 ? u_detail[0] : '';
                                                         if (k == p_data.length) {
                                                             res.send({
                                                                 message: "success",
-                                                                data: p_data,
+                                                                data: p_data,  
                                                             })
                                                         }
                                                     })
@@ -10482,11 +10526,12 @@ app.post(`${apiPrefix}getAllSensorBrandsList`, (req, res) => {
         })
 });
 
-app.post(`${apiPrefix}getSensorSimultionCount`, (req, res) => {
-    console.log('getSensorSimultionCount ----------------------')
-    getBrandData({ sensor: req.body.sensor })
+app.post(`${apiPrefix}getSensorSimultionCount`, (req, res) => { 
+var counter = 0 ;
+var brand = [] ;
+    getBrandData({ sensor: req.body.sensor }) 
         .then(simulation_records => {
-            brand["simulation_count"] = Number(simulation_records.length).toString();
+			brand["simulation_count"] = Number(simulation_records.length).toString();
             brand["simulation_status"] = '';
             brand["computed_time"] = '';
             brand["simulation_timestamp"] = '';
@@ -10503,8 +10548,7 @@ app.post(`${apiPrefix}getSensorSimultionCount`, (req, res) => {
                 return 0;
             });
 
-            if (simulation_records.length > 0) {
-                console.log('simulation_records ---------------------------------\n', simulation_records)
+            if (simulation_records[0]) {
                 getPlayerSimulationStatus_v2(simulation_records[0].image_id)
                     .then(simulation => {
 
@@ -10515,7 +10559,7 @@ app.post(`${apiPrefix}getSensorSimultionCount`, (req, res) => {
 
                         res.send({
                             message: "success",
-                            data: brandList
+                            data: brand
                         })
 
                     }).catch(err => {
@@ -10525,17 +10569,17 @@ app.post(`${apiPrefix}getSensorSimultionCount`, (req, res) => {
 
                 res.send({
                     message: "success",
-                    data: brandList
+                    data: brand
                 })
 
             }
         })
         .catch(err => {
             counter++
-            if (counter == brandList.length) {
+            if (counter == brand.length) {
                 res.send({
                     message: "failure",
-                    error: err
+                    error: err,
                 })
             }
         })
@@ -10740,24 +10784,30 @@ app.post(`${apiPrefix}getAllOrganizationsOfSensorBrand`, (req, res) => {
 
 
 app.post(`${apiPrefix}getAllOrganizationsSimultionCount`, (req, res) => {
-			console.log("req.body",req.body)
 	getBrandOrganizationCount(req.body)
         .then(simulation_records => {
-            var count = Number(simulation_records.length).toString();
-            simulation_records.forEach(function (simulation_record, index) {
-                simulation_record['date_time'] = simulation_record.player_id.split('$')[1];
-            })
+            var count = simulation_records;
+			
+           /* simulation_records.forEach(function (simulation_record, index) {
+                simulation_record['date_time'] = simulation_record./'?..split('$')[1];
+            }) */
 
-            simulation_records.sort(function (b, a) {
+           /*  simulation_records.sort(function (b, a) {
                 var keyA = a.date_time,
-                    keyB = b.date_time;
+                keyB = b.date_time;
                 if (keyA < keyB) return -1;
                 if (keyA > keyB) return 1;
                 return 0;
-            });
-			console.log("simulation_records",simulation_records)
-			console.log("image_id",simulation_records[0].image_id)
-            getPlayerSimulationStatus_v2(simulation_records[0].image_id)
+            }); */
+			if(simulation_records[0]){
+				 res.send({
+                        message: "success",
+                        count: count,
+                        simulation_status: '',
+                        computed_time: '',
+                        simulation_timestamp: '' 
+                    })
+           /* getPlayerSimulationStatus_v2(simulation_records[0].image_id)
                 .then(simulation => {
                     var simulation_status = simulation ? simulation.status : '';
                     var computed_time = simulation ? simulation.computed_time : '';
@@ -10777,7 +10827,17 @@ app.post(`${apiPrefix}getAllOrganizationsSimultionCount`, (req, res) => {
                         computed_time: '',
                         simulation_timestamp: ''
                     })
-                })
+                }) */
+			}else{
+				 res.send({
+                        message: 'success',
+                        count: count,
+                        simulation_status: '',
+                        computed_time: '',
+                        simulation_timestamp: ''
+                    })
+			}
+			
 
         })
         .catch(err => {
@@ -10905,9 +10965,10 @@ app.post(`${apiPrefix}getAllteamsOfOrganizationOfSensorBrand`, (req, res) => {
 app.post(`${apiPrefix}getTeamSimultionCount`, (req, res) => {
 	console.log("req",req.body);  
     getOrganizationTeamData_V2({ sensor: req.body.sensor, organization: req.body.organization, team: req.body.team })
-        .then(simulation_records => {
-            var count = Number(simulation_records.length).toString();
-            simulation_records.forEach(function (simulation_record, index) {
+        .then(simulation_records => {			
+			console.log(req.body.team, simulation_records);
+            var count = simulation_records; //Number(simulation_records.length).toString();
+           /* simulation_records.forEach(function (simulation_record, index) {
                 simulation_record['date_time'] = simulation_record.player_id.split('$')[1];
             })
 
@@ -10917,13 +10978,18 @@ app.post(`${apiPrefix}getTeamSimultionCount`, (req, res) => {
                 if (keyA < keyB) return -1;
                 if (keyA > keyB) return 1;
                 return 0;
-            });
-
-
-            console.log("simulation_records.", simulation_records);
-            getPlayerSimulationStatus_v2(simulation_records[0].image_id)
+            });  */
+			if(simulation_records[0]){
+				res.send({
+                        message: "success",
+                        count: count,
+                        simulation_status: '',
+                        computed_time: '',
+                        simulation_timestamp: ''
+                    })
+             /* getPlayerSimulationStatus_v2(simulation_records[0].image_id)
                 .then(simulation => {
-
+					
                     var simulation_status = simulation ? simulation.status : '';
                     var computed_time = simulation ? simulation.computed_time : '';
                     var simulation_timestamp = simulation_records[0].player_id.split('$')[1];
@@ -10942,8 +11008,16 @@ app.post(`${apiPrefix}getTeamSimultionCount`, (req, res) => {
                         computed_time: '',
                         simulation_timestamp: ''
                     })
-                })
-
+                }) */
+			}else{
+				res.send({
+                        message: "success",
+                        count: count,
+                        simulation_status: '',
+                        computed_time: '',
+                        simulation_timestamp: ''
+                    })
+			}
         })
         .catch(err => {
 

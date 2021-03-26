@@ -18,7 +18,7 @@ class SimulationCount extends React.Component {
     const {count, sensor, organization,isloadCount } = this.props;	
     if( count || count === '0' || count === 0){
     }else{
-      if(isloadCount === 1){
+   //   if(isloadCount === 1){
 		console.log("isloadCount", isloadCount);
         getAllOrganizationsSimultionCount({sensor,organization})
         .then(res =>{
@@ -35,7 +35,7 @@ class SimulationCount extends React.Component {
           this.setState({simulationCount: 0});
           this.props.setSimulationCount(0, organization,'','','');
         })
-      }
+    //  }
     }
   }
 
