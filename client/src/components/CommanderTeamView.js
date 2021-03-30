@@ -430,8 +430,8 @@ class CommanderTeamView extends React.Component {
         updateUserStatus({ user_cognito_id: id, status: status })
             .then(data => {
                 let users = this.state.users.map(function (player) {
-                    if (player.simulation_data[0]['user_data'].user_cognito_id === id) {
-                        player.simulation_data[0]['user_data'].player_status = status;
+                    if (player.user_data.user_cognito_id === id) {
+                        player.user_data.player_status = status;
                     }
                     return player
                 })
@@ -522,8 +522,8 @@ class CommanderTeamView extends React.Component {
         updateUserStatus({ user_cognito_id: editableId, sensor_id_number: sensor_id, type: 'uodate_sensor_id' })
             .then(data => {
                 let users = this.state.users.map(function (player) {
-                    if (player.simulation_data[0]['user_data'].user_cognito_id === editableId) {
-                        player.simulation_data[0]['user_data'].sensor_id_number = sensor_id;
+                    if (player.user_data.user_cognito_id === editableId) {
+                        player.user_data.sensor_id_number = sensor_id;
                     }
                     return player
                 })
@@ -550,13 +550,13 @@ class CommanderTeamView extends React.Component {
 
     renderSwitch = (player) => {
         if (this.state.editablestate) {
-            if (player.simulation_data[0]['user_data']) {
-                return <Switch id={player.simulation_data[0]['user_data'].user_cognito_id} onChange={this.handleCheck1} uncheckedIcon={false} offColor="#FF0000" onColor="#00B050" onHandleColor="#ffffff" className="react-switch" checkedIcon={false} checked={player.simulation_data[0]['user_data'].player_status === 'approved' ? true : false} />
+            if (player.user_data) {
+                return <Switch id={player.user_data.user_cognito_id} onChange={this.handleCheck1} uncheckedIcon={false} offColor="#FF0000" onColor="#00B050" onHandleColor="#ffffff" className="react-switch" checkedIcon={false} checked={player.user_data.player_status === 'approved' ? true : false} />
             } else {
-                return <Switch disabled={true} uncheckedIco-n={false} offColor="#FF0000" onColor="#00B050" onHandleColor="#ffffff" className="react-switch" checkedIcon={false} checked={player.simulation_data[0]['user_data'].player_status === 'approved' ? true : false} />
+                return <Switch disabled={true} uncheckedIco-n={false} offColor="#FF0000" onColor="#00B050" onHandleColor="#ffffff" className="react-switch" checkedIcon={false} checked={player.user_data.player_status === 'approved' ? true : false} />
             }
         } else {
-            return <Switch disabled={true} uncheckedIco-n={false} offColor="#FF0000" onColor="#00B050" onHandleColor="#ffffff" className="react-switch" checkedIcon={false} checked={player.simulation_data[0]['user_data'].player_status === 'approved' ? true : false} />
+            return <Switch disabled={true} uncheckedIco-n={false} offColor="#FF0000" onColor="#00B050" onHandleColor="#ffffff" className="react-switch" checkedIcon={false} checked={player.user_data.player_status === 'approved' ? true : false} />
         }
     }
 
@@ -919,23 +919,23 @@ class CommanderTeamView extends React.Component {
                                                                         onBlur={this.updateSensorId}
                                                                         onKeyDown={this.updateSensorIdOnEnter}
                                                                         onChange={this.handleChange}
-                                                                        onFocus={() => this.editable(player.simulation_data[0]['user_data'])}
+                                                                        onFocus={() => this.editable(player.user_data)}
                                                                         name="sensor_id"
-                                                                        defaultValue={player.simulation_data[0]['user_data'].sensor_id_number}
+                                                                        defaultValue={player.user_data.sensor_id_number}
                                                                         className="update-sensorid-input"
                                                                     />
-                                                                    {this.state.isSensorIdUpdating && this.state.editableId === player.simulation_data[0]['user_data'].user_cognito_id &&
+                                                                    {this.state.isSensorIdUpdating && this.state.editableId === player.user_data.user_cognito_id &&
                                                                         <i className="fa fa-spinner fa-spin" style={{ 'font-size': '24px' }}></i>
                                                                     }
                                                                 </>
                                                                 :
-                                                                <span onClick={() => { this.editable(player.simulation_data[0]['user_data']) }} className="edit-sensor-box">
-                                                                    {player.simulation_data[0]['user_data'].sensor_id_number ? player.simulation_data[0]['user_data'].sensor_id_number.substr(-8) + ' ' : 'Sensor ID  '}
+                                                                <span onClick={() => { this.editable(player.user_data) }} className="edit-sensor-box">
+                                                                    {player.user_data ? player.user_data.sensor_id_number.substr(-8) + ' ' : 'Sensor ID  '}
                                                                 </span>
                                                             }
                                                         </td>
                                                         {this.state.userDetails.level > 300 &&
-                                                            <td style={{ 'max-width': '162px' }} className="wrap-cell" onClick={() => { this.setRedirectData(Number(index + 1).toString(), player.simulation_data[0].player_id.split('$')[0]) }} >{player.simulation_data[0].user_data ? player.simulation_data[0].user_data.first_name + ' ' + player.simulation_data[0].user_data.last_name : player.simulation_data[0].player['first-name'] + ' ' + player.simulation_data[0].player['last-name']}</td>
+                                                            <td style={{ 'max-width': '162px' }} className="wrap-cell" onClick={() => { this.setRedirectData(Number(index + 1).toString(), player.simulation_data[0].player_id.split('$')[0]) }} >{player.simulation_data[0].user_data ? player.user_data.first_name + ' ' + player.user_data.last_name : player.simulation_data[0].player['first-name'] + ' ' + player.simulation_data[0].player['last-name']}</td>
                                                         }
                                                         <td onClick={() => { this.setRedirectData(Number(index + 1).toString(), player.simulation_data[0].player_id.split('$')[0]) }} >{player.simulation_data.length}</td>
 
@@ -949,7 +949,7 @@ class CommanderTeamView extends React.Component {
                                                             <React.Fragment>
                                                                 <td style={{ alignItems: "center" }}>
 
-                                                                    {this.state.isUpdating && this.state.isUpdating === player.simulation_data[0]['user_data'].user_cognito_id ?
+                                                                    {this.state.isUpdating && this.state.isUpdating === player.user_data.user_cognito_id ?
                                                                         <div className="d-flex justify-content-center center-spinner">
                                                                             <div
                                                                                 className="spinner-border text-primary"
@@ -961,7 +961,7 @@ class CommanderTeamView extends React.Component {
                                                                     }
                                                                 </td>
                                                                 <td>
-                                                                    {this.getUrl(player.simulation_data[0]['user_data'])}
+                                                                    {this.getUrl(player.user_data)}
                                                                 </td>
                                                                 {this.state.editablestate ?
                                                                     <>

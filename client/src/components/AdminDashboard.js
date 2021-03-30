@@ -1190,10 +1190,10 @@ setProcessingState = (msg) => {
                 lsitOrg[i].computed_time =  computed_time;
                 lsitOrg[i].simulation_timestamp =  simulation_timestamp;
             }
-
         }
 
-        this.setState({teamList: lsitOrg});
+        this.setState({teamList: lsitOrg});		
+		this.iterateTeam3();
     }
 
 
@@ -1874,7 +1874,17 @@ setProcessingState = (msg) => {
                                                                                             */}
                                                                         <td style={{ alignItems: "center" }}>{dateTime.split(' ')[0]}</td>
                                                                         <td style={{ alignItems: "center" }}>{this.tConvert(dateTime.split(' ')[1])}</td>
-                                                                        <td style={{ alignItems: "center" }}><a className="btn btn-primary" target='_blank' href={"/profile?id=" + player.simulation_data[0].user_data.account_id}>Profile</a></td>
+                                                                        <td style={{ alignItems: "center" }}>
+																		{ player.user_data ?
+																		<>
+																		<a className="btn btn-primary" target='_blank' href={"/profile?id=" + player.user_data?player.user_data.account_id:""}>Profile</a>
+																		</>
+																		: 
+																		<>
+																		<button className="btn btn-primary" disabled={true}>Profile</button>;
+																		</>
+																		}
+																		</td>
                                                                     </tr>;
                                                                 } else {
                                                                     return false;
@@ -1891,8 +1901,17 @@ setProcessingState = (msg) => {
                                                                         <td>-</td>
                                                                         <td>-</td>
                                                                         <td>-</td>
-                                                                        <td style={{ alignItems: "center" }}><a className="btn btn-primary" target='_blank' href={"/profile?id=" + r_player.user_data.account_id}>Profile</a></td>
-
+                                                                        <td style={{ alignItems: "center" }}>
+																		{r_player ? 
+																		<>
+																			<a className="btn btn-primary" target='_blank' href={"/profile?id=" + r_player?r_player.account_id:""}>Profile</a>
+																		</>
+																		:
+																		<>
+																			<button className="btn btn-primary" disabled={true}>Profile</button>;
+																		</>
+																		}
+																		</td>
                                                                     </tr>
                                                                 } else {
                                                                     return false

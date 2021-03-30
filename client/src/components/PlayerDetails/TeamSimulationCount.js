@@ -3,7 +3,7 @@ import React from 'react';
 import {
   getTeamSimultionCount,
 } from '../../apis';
-class SimulationCount extends React.Component {
+class TeamSimulationCount extends React.Component {
   constructor(props) {
     super(props);
 
@@ -12,7 +12,8 @@ class SimulationCount extends React.Component {
       simulationCount: ''
     }
   }
-  componentWillReceiveProps() {
+ /* componentWillReceiveProps() {
+	   console.log('res ---',this.props);
     const { count, sensor, team, organization, isloadCount } = this.props;
     if (count || count === '0' || count === 0) {
 
@@ -37,10 +38,35 @@ class SimulationCount extends React.Component {
      //  }
 
     }
+  } */
+  componentDidMount() {
+    const { count, sensor, team, organization, isloadCount } = this.props;
+    if (count || count === '0' || count === 0) {
+
+    } else {
+     // if (isloadCount === 1) {
+        getTeamSimultionCount({ sensor, organization, team })
+          .then(res => {
+            if (res.data.message === "success") {
+              this.setState({ simulationCount: res.data.count });
+              this.props.setSimulationCount(res.data.count, team, res.data.simulation_status, res.data.computed_time, res.data.simulation_timestamp, organization);
+            } else {
+              this.setState({ simulationCount: 0 });
+              this.props.setSimulationCount(0, team, '', '', '', organization);
+
+            }
+          }).catch(err => {
+            console.log('err', err);
+            this.setState({ simulationCount: 0 });
+            this.props.setSimulationCount(0, team, '', '', '', organization);
+          })
+     //  }
+
+    }
   }
 
   render() {
-    // console.log("Props are - ", this.props);
+     console.log("Props are - ", this.props);
     const { count } = this.props;
     const { simulationCount } = this.state;
     return (
@@ -62,4 +88,4 @@ class SimulationCount extends React.Component {
   }
 }
 
-export default SimulationCount;
+export default TeamSimulationCount;

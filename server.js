@@ -32,7 +32,7 @@ let ejs = require("ejs");
 let pdf = require("html-pdf");
 let csvjson = require('csvjson');
 const csvparser = require("csvtojson");
-var db_connection  = require('./middlewares/dbConnection')
+var db_connection  = require('./middlewares/dbConnection');
 
 app.use(express.static(path.resolve('./public')));
 // var transporter = nodemailer.createTransport({
@@ -152,6 +152,7 @@ const {
     getCumulativeAccelerationRecords,
     addPlayer,
     getUserDetailByPlayerId,
+    getUserDetailByPlayerId1,
     getAllTeamsOfOrganizationsOfSensorBrand,
     getSimulationImageRecord,
     createUserDbEntry,
@@ -4451,10 +4452,7 @@ app.post(`${apiPrefix}getPlayerList`, (req, res) => {
             var counter = 0;
             var indx = 0;
             var p_data = [];
-            var player_listLn = player_list.length;
-			
-			console.log("player_list",player_list);
-			
+            var player_listLn = player_list.length;				
             player_list.forEach(function (player, index) {
                 let p = player;
                 let playerData = '';
@@ -4470,8 +4468,8 @@ app.post(`${apiPrefix}getPlayerList`, (req, res) => {
                                 simulation_data: playerData,
                                 date_time: playerData[0] ? playerData[0].player_id.split('$')[1] : '',
                             });
-
-                            if (counter == player_listLn) {
+                            
+							if (counter == player_listLn) {
                                 p_data.sort(function (b, a) {
                                     var keyA = a.date_time,
                                         keyB = b.date_time;
@@ -4479,22 +4477,23 @@ app.post(`${apiPrefix}getPlayerList`, (req, res) => {
                                     if (keyA > keyB) return 1;
                                     return 0;
                                 });
+                            
 
                                 let k = 0;
                                 var p_datalen = p_data.length;
                                 p_data.forEach(function (record, index) {
+							console.log('player_id ', record.simulation_data[0]['player_id'].split('$')[0]);
                                     if (record.simulation_data[0]) {
-                                        getPlayerSimulationStatus(record.simulation_data[0].image_id)
+                                        getPlayerSimulationStatus(record.simulation_data[0]['image_id'])
                                             .then(simulation => {
                                                 // console.log('simulation',simulation.status
                                                 p_data[index]['simulation_data'][0]['simulation_status'] = simulation ? simulation.status : '';
                                                 p_data[index]['simulation_data'][0]['computed_time'] = simulation ? simulation.computed_time : '';
-                                                getUserDetailByPlayerId(record.simulation_data[0].player_id.split('$')[0])
+                                                getUserDetailByPlayerId1(record.simulation_data[0]['player_id'].split('$')[0])
                                                     .then(u_detail => {
                                                         k++;
-                                                        console.log('user details ', u_detail)
-                                                        p_data[index]['simulation_data'][0]['user_data'] = u_detail.length > 0 ? u_detail[0] : '';
-                                                        if (k == p_data.length) {
+                                                        p_data[index]['user_data'] = u_detail.length > 0 ? u_detail[0] : '';
+                                                          if (k == p_datalen) {
                                                             res.send({
                                                                 message: "success",
                                                                 data: p_data,  
@@ -4641,12 +4640,12 @@ app.post(`${apiPrefix}loadMorePlayerList`, (req, res) => {
                                             p_data[index]['simulation_data'][0]['simulation_status'] = simulation ? simulation.status : '';
                                             p_data[index]['simulation_data'][0]['computed_time'] = simulation ? simulation.computed_time : '';
 
-                                            getUserDetailByPlayerId(record.simulation_data[0].player_id.split('$')[0])
+                                            getUserDetailByPlayerId(record.simulation_data[0]["player_id"].split('$')[0])
                                                 .then(u_detail => {
 
                                                     k++;
                                                     // console.log('user details ', u_detail[0]['account_id'])
-                                                    p_data[index]['simulation_data'][0]['user_data'] = u_detail.length > 0 ? u_detail[0] : '';
+                                                    p_data[index]['user_data'] = u_detail.length > 0 ? u_detail[0] : '';
                                                     if (k == p_data.length) {
                                                         let requested_players = []
                                                         if (requested_player_list.length > 0) {
@@ -8964,7 +8963,7 @@ app.post(`${apiPrefix}getPlayersData`, (req, res) => {
                                     console.log('playerlist executed -----------------------\n', p_data)
                                     if (p_data.length > 0) {
                                         p_data.forEach(function (record, index) {
-                                            console.log('record.simulation_data[0]', record.simulation_data[0].image_id)
+                                            console.log('record.simulation_data[0]', record.simulation_data[0]["image_id"])
                                             getPlayerSimulationFile(record.simulation_data[0])
                                                 .then(simulation => {
                                                     p_data[index]['simulation_data'][0]['simulation_status'] = simulation ? simulation.status : '';
@@ -8973,15 +8972,15 @@ app.post(`${apiPrefix}getPlayersData`, (req, res) => {
                                                     p_data[index]['simulation_data'][0]['computed_time'] = simulation ? simulation.computed_time : '';
                                                     if (record.used_sensor) {
                                                         console.log('record.used_sensor) ---------------- ', record.used_sensor)
-                                                        var player_id = record.simulation_data[0].player_id.split('$')[0] + '-' + record.used_sensor;
+                                                        var player_id = record.simulation_data[0]["player_id"].split('$')[0] + '-' + record.used_sensor;
                                                     } else {
-                                                        var player_id = record.simulation_data[0].player_id.split('$')[0];
+                                                        var player_id = record.simulation_data[0]["player_id"].split('$')[0];
                                                     }
-                                                    getUserDetailByPlayerId(player_id)
+                                                    getUserDetailByPlayerId1(player_id) 
                                                         .then(u_detail => {
                                                             k++;
                                                             // console.log('user details ', u_detail[0]['first_name'])
-                                                            p_data[index]['simulation_data'][0]['user_data'] = u_detail.length > 0 ? u_detail[0] : '';
+                                                            p_data[index]['user_data'] = u_detail.length > 0 ? u_detail[0] : '';
                                                             if (k == p_data.length) {
                                                                 let requested_players = []
                                                                 if (requested_player_list.length > 100) {

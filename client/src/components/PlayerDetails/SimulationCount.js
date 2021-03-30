@@ -14,7 +14,7 @@ class SimulationCount extends React.Component {
   }
 
 
-  componentWillReceiveProps (){
+  componentDidMount (){
     const {count, sensor, organization,isloadCount } = this.props;	
     if( count || count === '0' || count === 0){
     }else{
