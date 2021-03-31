@@ -3312,7 +3312,7 @@ app.post(`${apiPrefix}renameTeam`, (req, res) => {
             let sensor_cnt = 0;
             if (sensor_data.length > 0) {
                 sensor_data.forEach(function (record, index) {
-                    const params = {
+                   /* const params = {
                         TableName: "sensor_details",
                         Key: {
                             org_id: record.org_id,
@@ -3323,8 +3323,12 @@ app.post(`${apiPrefix}renameTeam`, (req, res) => {
                             ":team_name": team_name
                         },
                         ReturnValues: "UPDATED_NEW"
-                    };
-                    docClient.update(params, function (err, data1) {
+                    };*/
+					const sensorDetails = require("./models/sensors/sensorDetailsData");
+					var myquery = { org_id: record.org_id,player_id: record.player_id };
+					var newvalues = { $set: {team: team_name } };
+					sensorDetails.updateOne(myquery, newvalues, function(err, res) {
+                   // docClient.update(params, function (err, data1) {
                         if (err) {
                             console.log("Error when updating data\n", err);
                         } else {
@@ -8504,6 +8508,7 @@ app.post(`${apiPrefix}getMpsRankedData`, (req, res) => {
 app.post(`${apiPrefix}getCumulativeAccelerationTimeRecords`, (req, res) => {
     getCumulativeAccelerationRecords(req.body)
         .then(data => {
+			console.log("data",data);
             let acceleration_data_list = [];
             // let frontal_Lobe = [];
             let brainRegions = {};
@@ -8568,14 +8573,15 @@ app.post(`${apiPrefix}getCumulativeAccelerationTimeRecords`, (req, res) => {
                                 if (val.toFixed(4) !== '0.0000') msp_dat_data.push({ id: mpsval[0], val: val });
                             }
                         }
-
+ 
                         console.log('wrking for other')
                         // X- Axis Linear Acceleration
                         let linear_acceleration = accData['impact-date'] ? accData.simulation['linear-acceleration'] : accData['linear-acceleration'];
                         // X- Axis Angular Acceleration
                         let angular_acceleration = accData['impact-date'] ? accData.simulation['angular-acceleration'] : accData['angular-acceleration'];
                         // Y Axis timestamp
-                        let time = accData['impact-date'] ? accData.simulation['linear-acceleration']['xt'] : accData['linear-acceleration']['xt'];
+						console.log("accData",accData);
+                        let time = accData['impact-date'] ? accData.simulation['linear-acceleration'].xt : accData['linear-acceleration'].xt;
                         time = time ? time : [];
 
                         // console.log(time);
@@ -10707,7 +10713,7 @@ app.post(`${apiPrefix}getAllOrganizationsOfSensorBrand`, (req, res) => {
                     uniqueList.push(organization.organization);
                     return organization;
                 }
-            });
+            }); 
 
             let counter = 0;
             if (orgList.length == 0) {
@@ -10785,28 +10791,28 @@ app.post(`${apiPrefix}getAllOrganizationsOfSensorBrand`, (req, res) => {
 app.post(`${apiPrefix}getAllOrganizationsSimultionCount`, (req, res) => {
 	getBrandOrganizationCount(req.body)
         .then(simulation_records => {
-            var count = simulation_records;
+            var count = Number(simulation_records.length).toString();
 			
-           /* simulation_records.forEach(function (simulation_record, index) {
-                simulation_record['date_time'] = simulation_record./'?..split('$')[1];
-            }) */
+            simulation_records.forEach(function (simulation_record, index) {
+                simulation_record['date_time'] = simulation_record['player_id'].split('$')[1];
+            }) 
 
-           /*  simulation_records.sort(function (b, a) {
+             simulation_records.sort(function (b, a) {
                 var keyA = a.date_time,
                 keyB = b.date_time;
                 if (keyA < keyB) return -1;
                 if (keyA > keyB) return 1;
                 return 0;
-            }); */
+            }); 
 			if(simulation_records[0]){
-				 res.send({
+				/* res.send({
                         message: "success",
                         count: count,
                         simulation_status: '',
                         computed_time: '',
                         simulation_timestamp: '' 
-                    })
-           /* getPlayerSimulationStatus_v2(simulation_records[0].image_id)
+                    })*/
+            getPlayerSimulationStatus_v2(simulation_records[0].image_id)
                 .then(simulation => {
                     var simulation_status = simulation ? simulation.status : '';
                     var computed_time = simulation ? simulation.computed_time : '';
@@ -10826,7 +10832,7 @@ app.post(`${apiPrefix}getAllOrganizationsSimultionCount`, (req, res) => {
                         computed_time: '',
                         simulation_timestamp: ''
                     })
-                }) */
+                }) 
 			}else{
 				 res.send({
                         message: 'success',
@@ -10966,8 +10972,8 @@ app.post(`${apiPrefix}getTeamSimultionCount`, (req, res) => {
     getOrganizationTeamData_V2({ sensor: req.body.sensor, organization: req.body.organization, team: req.body.team })
         .then(simulation_records => {			
 			console.log(req.body.team, simulation_records);
-            var count = simulation_records; //Number(simulation_records.length).toString();
-           /* simulation_records.forEach(function (simulation_record, index) {
+            var count = Number(simulation_records.length).toString();
+            simulation_records.forEach(function (simulation_record, index) {
                 simulation_record['date_time'] = simulation_record.player_id.split('$')[1];
             })
 
@@ -10977,16 +10983,16 @@ app.post(`${apiPrefix}getTeamSimultionCount`, (req, res) => {
                 if (keyA < keyB) return -1;
                 if (keyA > keyB) return 1;
                 return 0;
-            });  */
+            });  
 			if(simulation_records[0]){
-				res.send({
+				/*res.send({
                         message: "success",
                         count: count,
                         simulation_status: '',
                         computed_time: '',
                         simulation_timestamp: ''
-                    })
-             /* getPlayerSimulationStatus_v2(simulation_records[0].image_id)
+                    })*/
+              getPlayerSimulationStatus_v2(simulation_records[0].image_id)
                 .then(simulation => {
 					
                     var simulation_status = simulation ? simulation.status : '';
@@ -11007,7 +11013,7 @@ app.post(`${apiPrefix}getTeamSimultionCount`, (req, res) => {
                         computed_time: '',
                         simulation_timestamp: ''
                     })
-                }) */
+                }) 
 			}else{
 				res.send({
                         message: "success",
@@ -15040,7 +15046,7 @@ app.post(`${apiPrefix}deleteEventByImageID`, (req, res) => {
                                             }).catch(err => {
                                                 console.log('deldata1  err', err)
                                             })
-                                    } else {
+                                     } else {
                                         deleteSimulation_imagesData(data.image_id)
                                             .then(deldata => {
                                                 console.log("image_Data 2", image_Data)
@@ -15052,7 +15058,7 @@ app.post(`${apiPrefix}deleteEventByImageID`, (req, res) => {
                                                                 message: 'success',
                                                                 status: 200
                                                             })
-                                                        })
+                                                        }) 
                                                     } else {
                                                         res.send({
                                                             message: 'success',

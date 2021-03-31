@@ -395,7 +395,7 @@ function getCumulativeAccelerationData(obj) {
                 if (org.length > 0) {
                     let params;
                     if (obj.brand && obj.brand != 'null') {
-                        params = {
+                       /* params = {
                             TableName: "sensor_details",
                             KeyConditionExpression:  "org_id = :org_id and begins_with(player_id,:player_id)",
                             FilterExpression: "organization = :organization and team = :team",
@@ -407,9 +407,10 @@ function getCumulativeAccelerationData(obj) {
                                 ":player_id": obj.player_id + '$',
                             },
                             ScanIndexForward: false
-                        };
+                        };*/
+						params = {org_id : org[0].organization_id,organization : obj.organization , team :obj.team,player_id :   {$regex: obj.player_id, $options: 'i'}};
                     } else {
-                        params = {
+                       /* params = {
                             TableName: "sensor_details",
                             KeyConditionExpression:  "org_id = :org_id and begins_with(player_id,:player_id)",
                             FilterExpression: "organization = :organization and team = :team",
@@ -420,10 +421,24 @@ function getCumulativeAccelerationData(obj) {
                                 ":player_id": obj.player_id + '$',
                             },
                             ScanIndexForward: false
-                        };
+                        };*/
+						
+						params = {org_id : org[0].organization_id,organization : obj.organization , team :obj.team,player_id :   {$regex: obj.player_id, $options: 'i'}};
                     }
+				  const sensorDetails = require("../models/sensors/sensorDetailsData");		
+						var item = [];
+						sensorDetails.find(params, function (err, details) {
+							if (err) {
+								reject(err);
+							}
+							if (details == null) {
+								resolve([]);
+							} else {
+								resolve(details);
+							}
+						}); 
                     
-                    var item = [];
+                /*    var item = [];
                     docClient.query(params).eachPage((err, data, done) => {
                         if (err) {
                             reject(err);
@@ -434,7 +449,7 @@ function getCumulativeAccelerationData(obj) {
                             item.push(data.Items);
                         }
                         done();
-                    });
+                    });*/
                 } else {
                     resolve([]);
                 }
@@ -480,7 +495,7 @@ function getCumulativeAccelerationRecords(obj) {
                 if (org.length > 0) {
                     let params;
                     if (obj.brand && obj.brand != 'null') {
-                        params = {
+                       /* params = {
                             TableName: "sensor_details",
                             KeyConditionExpression:  "org_id = :org_id and player_id= :player_id",
                             FilterExpression: "organization = :organization and team = :team",
@@ -491,9 +506,11 @@ function getCumulativeAccelerationRecords(obj) {
                                 ":player_id": obj.player_id,
                             },
                             ScanIndexForward: false
-                        };
+                        };*/
+						
+						params = {org_id : org[0].organization_id,organization : obj.organization , team :obj.team,player_id :   obj.player_id};
                     } else {
-                        params = {
+                      /*  params = {
                             TableName: "sensor_details",
                             KeyConditionExpression:  "org_id = :org_id and player_id= :player_id",
                             FilterExpression: "organization = :organization and team = :team",
@@ -504,10 +521,24 @@ function getCumulativeAccelerationRecords(obj) {
                                 ":player_id": obj.player_id,
                             },
                             ScanIndexForward: false
-                        };
+                        };*/
+						
+						params = {org_id : org[0].organization_id,organization : obj.organization , team :obj.team,player_id :   obj.player_id}
                     }
-                    console.log("params",params); 
-                    var item = [];
+					console.log("params",params);
+					const sensorDetails = require("../models/sensors/sensorDetailsData");		
+						var item = [];
+						sensorDetails.find(params, function (err, details) {
+							if (err) {
+								reject(err);
+							}
+							if (details == null) {
+								resolve([]);
+							} else {
+								resolve(details);
+							} 
+						}); 
+                   /* var item = [];
                     docClient.query(params).eachPage((err, data, done) => {
                         if (err) {
                             reject(err);
@@ -519,7 +550,7 @@ function getCumulativeAccelerationRecords(obj) {
                             item.push(data.Items);
                         }
                         done();
-                    });
+                    });*/
                 } else {
                     resolve([]);
                 }
@@ -820,12 +851,59 @@ function storeSensorData(sensor_data_array) {
             if (sensor_data_array[i].level === 300) {
                 delete sensor_data_array[i].sensor
             }
-            let param = {
+           /* let param = {
                 TableName: "sensor_details",
                 Item: sensor_data_array[i],
-            };
-
-            docClient.put(param, function (err, data) {
+            }; */
+			var simulation = {
+				"angular-velocity":"",
+				"angular-acceleration":"",
+				"linear-acceleration":"",
+				"mesh-transformation":"",
+				"angular-velocity":"",
+			}
+			if(sensor_data_array[i]['angular-velocity']){
+				simulation["angular-velocity"] = sensor_data_array[i]['angular-velocity'];
+			}
+			if(sensor_data_array[i]['angular-acceleration']){
+				simulation["angular-acceleration"]= sensor_data_array[i]['angular-acceleration'];
+			}
+			if(sensor_data_array[i]['linear-acceleration']){
+				simulation["linear-acceleration"]=sensor_data_array[i]['linear-acceleration'];
+			}
+			if(sensor_data_array[i]['mesh-transformation']){
+				simulation["mesh-transformation"] = sensor_data_array[i]['mesh-transformation'];
+			}
+			if(sensor_data_array[i]['la-units']){
+				simulation["la-units"] = sensor_data_array[i]['la-units'];
+			}
+			const sensorDetails = require("../models/sensors/sensorDetailsData");
+			var sensor = new sensorDetails(
+				{
+					org_id: sensor_data_array[i].org_id,
+					player_id: sensor_data_array[i].player_id,
+					image_id: sensor_data_array[i].image_id,
+					'impact-date': sensor_data_array[i]['impact-date']?sensor_data_array[i]['impact-date']:sensor_data_array[i]['date'],
+					'impact-time': sensor_data_array[i]['impact-time']?sensor_data_array[i]['impact-time']:sensor_data_array[i]['time'],
+					level: sensor_data_array[i].level,
+					organization: sensor_data_array[i].organization,
+					player: sensor_data_array[i].player,
+					simulation: simulation,
+					simulation_status: sensor_data_array[i].simulation_status,
+					team: sensor_data_array[i].team,
+					sensor: sensor_data_array[i].sensor,
+					user_cognito_id: sensor_data_array[i].user_cognito_id
+				}
+			);
+			sensor.save(function (err) {
+				if (err) {					
+					reject(err);
+				}
+				else {
+					resolve(true);
+				}
+			});	 
+           /* docClient.put(param, function (err, data) {
                 counter++;
                 if (err) {
                     console.log(err);
@@ -834,7 +912,7 @@ function storeSensorData(sensor_data_array) {
                 if (counter == sensor_data_array.length) {
                     resolve(true);
                 }
-            });
+            }); */
         }
     });
 }
@@ -1493,14 +1571,27 @@ function getBrandData(obj) {
 }
 function getSensorDataByPlayerID(player_id) {
     return new Promise((resolve, reject) => {
-        let params = {
+       /* let params = {
             TableName: "sensor_details",
             FilterExpression: "begins_with(player_id,:player_id)",
             ExpressionAttributeValues: {
                ":player_id": player_id
             },
-        };
-        var item = [];
+        };*/
+		let params = {player_id :   {$regex: player_id, $options: 'i'}}
+		const sensorDetails = require("../models/sensors/sensorDetailsData");		
+		var item = [];
+		sensorDetails.find(params, function (err, details) {
+			if (err) {
+				reject(err);
+			}
+			if (details == null) {
+				resolve([]);
+			} else {
+				resolve(details);
+			} 
+		}); 
+       /* var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
             if (err) {
                 reject(err);
@@ -1511,14 +1602,14 @@ function getSensorDataByPlayerID(player_id) {
                 item.push(data.Items);
             }
             done();
-        });
+        });*/
     });
 }
 
 function getBrandDataByorg(brand,organization) {
     return new Promise((resolve, reject) => {
 		if(brand !== undefined ){
-			console.log("brand",brand)
+			/*console.log("brand",brand)
 			var params = {
 				TableName: "sensor_details",
 				FilterExpression: "sensor = :sensor and organization = :organization",
@@ -1527,9 +1618,10 @@ function getBrandDataByorg(brand,organization) {
 				   ":organization": organization
 				},
 				ProjectionExpression: "sensor,player_id,computed_time,image_id,team"
-			};
+			};*/
+			params = {sensor : brand,organization : organization }
 		}else{
-			console.log("brand1",brand)
+			/*console.log("brand1",brand)
 			var params = {
 				TableName: "sensor_details",
 				FilterExpression: "organization = :organization",
@@ -1537,9 +1629,23 @@ function getBrandDataByorg(brand,organization) {
 				   ":organization": organization
 				},
 				ProjectionExpression: "sensor,player_id,computed_time,image_id,team"
-			};
+			};*/
+			
+			var params = {organization : organization}
 		}
-        var item = [];
+		const sensorDetails = require("../models/sensors/sensorDetailsData");		
+		var item = [];
+		sensorDetails.find(params, function (err, details) {
+			if (err) {
+				reject(err);
+			}
+			if (details == null) {
+				resolve([]);
+			} else {
+				resolve(details);
+			} 
+		}); 
+     /*   var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
             if (err) {
                 reject(err);
@@ -1550,7 +1656,7 @@ function getBrandDataByorg(brand,organization) {
                 item.push(data.Items);
             }
             done();
-        });
+        });*/
     });
 }
 
@@ -1584,7 +1690,7 @@ function getBrandOrganizationData(sensor, organization) {
         let params;
 
         if (sensor !== '') {
-            params = {
+			/* params = {
                 TableName: "sensor_details",
                 FilterExpression: "sensor = :sensor and organization = :organization",
                 ExpressionAttributeValues: {
@@ -1592,19 +1698,33 @@ function getBrandOrganizationData(sensor, organization) {
                     ":organization": organization
                 },
                 ProjectionExpression: "sensor,image_id,player_id,computed_time"
-            };
+            };*/
+			params = {sensor : sensor, organization : organization}
         } else {
-            params = {
+           /* params = {
                 TableName: "sensor_details",
                 FilterExpression: "organization = :organization",
                 ExpressionAttributeValues: {
                    ":organization": organization
                 },
                 ProjectionExpression: "sensor,image_id,player_id,computed_time"
-            };
+            };*/
+			
+			params = {organization : organization}
         }
-        
-        var item = [];
+        const sensorDetails = require("../models/sensors/sensorDetailsData");		
+		var item = [];
+		sensorDetails.find(params, function (err, details) {
+			if (err) {
+				reject(err);
+			}
+			if (details == null) {
+				resolve([]);
+			} else {
+				resolve(details);
+			} 
+		}); 
+		/*var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
             if (err) {
                 reject(err);
@@ -1615,7 +1735,7 @@ function getBrandOrganizationData(sensor, organization) {
                 item.push(data.Items);
             }
             done();
-        });
+        });*/
     });
 }
 function getAllTeamsOfOrganizationsOfSensorBrand(obj) {
@@ -1710,7 +1830,7 @@ function getOrganizationTeamData(obj) {
                 if (org.length > 0) {
                     let params;
                     if (obj.sensor) {
-                        params = {
+                      /*  params = {
                             TableName: "sensor_details",
                             // KeyConditionExpression:  "org_id = :org_id",
                             FilterExpression: "organization = :organization and team = :team",
@@ -1722,9 +1842,11 @@ function getOrganizationTeamData(obj) {
                             },
                             ProjectionExpression: "sensor,player_id,computed_time,image_id,team, org_id",
                             ScanIndexForward: false
-                        };
+                        }; */
+						
+						params = {organization : obj.organization , team :obj.team}
                     } else {
-                        params = {
+                       /* params = {
                             TableName: "sensor_details",
                             // KeyConditionExpression: "org_id = :org_id",
                             FilterExpression: "organization = :organization and team = :team",
@@ -1735,9 +1857,22 @@ function getOrganizationTeamData(obj) {
                             },
                             ProjectionExpression: "sensor,image_id,computed_time,player_id, org_id",
                             ScanIndexForward: false
-                        };
+                        }; */
+						params = {organization : obj.organization , team :obj.team}
                     }
-                    var item = [];
+					const sensorDetails = require("../models/sensors/sensorDetailsData");		
+					var item = [];
+					sensorDetails.find(params, function (err, details) {
+						if (err) {
+							reject(err);
+						}
+						if (details == null) {
+							resolve([]);
+						} else {
+							resolve(details);
+						} 
+					}); 
+                    /* var item = [];
                     docClient.scan(params).eachPage((err, data, done) => {
                         if (err) {
                             console.log('err',err)
@@ -1749,7 +1884,7 @@ function getOrganizationTeamData(obj) {
                             item.push(data.Items);
                         }
                         done();
-                    });
+                    });*/
                 } else {
                     resolve([]);
                 }
@@ -1768,7 +1903,7 @@ function getOrganizationTeamData_V2(obj) {
 		console.log("player_obj",player_obj);
 		const sensorDetails = require("../models/sensors/sensorDetailsData");		
 			var item = [];
-			sensorDetails.find({ organization: obj.organization, team :obj.team }).count(function(err, count){
+			sensorDetails.find({ organization: obj.organization, team :obj.team },function(err, count){
 				if (err) {
 					reject(err);
 				}
@@ -2181,11 +2316,23 @@ function getOrganizationList() {
 }
 function getallsensordetails() {
     return new Promise((resolve, reject) => {
-        var params = {
+		/* var params = {
             TableName: 'sensor_details'
         };
-		console.log("params",params);
-        var item = [];
+		console.log("params",params); */
+		const sensorDetails = require("../models/sensors/sensorDetailsData");		
+		var item = [];
+		sensorDetails.find({}, function (err, details) {
+			if (err) {
+				reject(err);
+			}
+			if (details == null) {
+				resolve([]);
+			} else {
+				resolve(details);
+			} 
+		}); 
+       /* var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
             if (err) {
                 reject(err);
@@ -2197,7 +2344,7 @@ function getallsensordetails() {
                 item.push(data.Items);
             }
             done();
-        });
+        }); */
     });
 }
 
@@ -2845,14 +2992,28 @@ function getOrganizatonByTeam(organization, team_name,sensor){
 
 function getOrgSensorData(organization, sensor){
     return new Promise((resolve, reject) =>{
-        let params = {
+        /* let params = {
             TableName: "sensor_details",
             FilterExpression: "organization= :organization and sensor = :sensor",
             ExpressionAttributeValues: {
                ":sensor": sensor,
                ":organization": organization
             },
-        };
+        };*/
+		params = {organization : organization, sensor :sensor}
+		const sensorDetails = require("../models/sensors/sensorDetailsData");		
+		var item = [];
+		sensorDetails.find(params, function (err, details) {
+			if (err) {
+				reject(err);
+			}
+			if (details == null) {
+				resolve([]);
+			} else {
+				resolve(details);
+			} 
+		}); 
+		/*
         var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
             if (err) {
@@ -2864,7 +3025,7 @@ function getOrgSensorData(organization, sensor){
                 item.push(data.Items);
             }
             done();
-        });
+        });*/
     })
 }
 
@@ -2899,7 +3060,7 @@ function renameOrganization(OrganizationName,organization_id) {
 function renameSensorOrganization(OrganizationName,player_id, org_id) {
     console.log('OrganizationName',OrganizationName)
     return new Promise((resolve, reject) => {
-        var params = {
+      /*  var params = {
             TableName: "sensor_details",
             Key: { 
                 "org_id": org_id,
@@ -2913,8 +3074,12 @@ function renameSensorOrganization(OrganizationName,player_id, org_id) {
                 ":organization": OrganizationName
             },
             ReturnValues: "UPDATED_NEW"
-        }
-        docClient.update(params, function (err, data) {
+        } */
+		const sensorDetails = require("./models/sensors/sensorDetailsData");
+		var myquery = { org_id: org_id,player_id: player_id };
+		var newvalues = { $set: {organization: OrganizationName } };
+		sensorDetails.updateOne(myquery, newvalues, function(err, res) {
+        //docClient.update(params, function (err, data) {
             if (err) {
                 console.log("error when updating sensor data\n",err);
                 reject(err);
@@ -3023,7 +3188,7 @@ function addorgTeam(TeamName, organization,sensor) {
 
 function getSernsorDataByOrgTeam(org_id, team_name, organization){
     return new Promise((resolve, reject) =>{
-        var params = {
+       /* var params = {
                 TableName: "sensor_details",
                 KeyConditionExpression:  "org_id = :org_id",
                 FilterExpression: "team = :team and organization = :organization ",
@@ -3032,8 +3197,21 @@ function getSernsorDataByOrgTeam(org_id, team_name, organization){
                     ":team": team_name,
                     ":organization": organization,
                 },
-            };
-        var item = [];
+            }; */
+			var params = {org_id : org_id,organization : organization , team :team_name}
+			const sensorDetails = require("../models/sensors/sensorDetailsData");		
+			var item = [];
+			sensorDetails.find(params, function (err, details) {
+				if (err) {
+					reject(err);
+				}
+				if (details == null) {
+					resolve([]);
+				} else {
+					resolve(details);
+				} 
+			}); 
+	   /* var item = [];
         docClient.query(params).eachPage((err, data, done) => {
             if (err) {
                 reject(err);
@@ -3044,21 +3222,34 @@ function getSernsorDataByOrgTeam(org_id, team_name, organization){
                 item.push(data.Items);
             }
             done();
-        });
+        }); */
     })
 }
 
 function getSernsorDataByTeam(team_name, organization){
     return new Promise((resolve, reject) =>{
-        var params = {
+       /* var params = {
                 TableName: "sensor_details",
                 FilterExpression: "team = :team and organization = :organization ",
                 ExpressionAttributeValues: {
                     ":team": team_name,
                     ":organization": organization,
                 },
-            };
-        var item = [];
+            };*/
+			var params = {organization : organization , team :team_name}
+			const sensorDetails = require("../models/sensors/sensorDetailsData");		
+			var item = [];
+			sensorDetails.find(params, function (err, details) {
+				if (err) {
+					reject(err);
+				}
+				if (details == null) {
+					resolve([]);
+				} else {
+					resolve(details);
+				} 
+			}); 
+      /*  var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
             if (err) {
                 reject(err);
@@ -3069,7 +3260,7 @@ function getSernsorDataByTeam(team_name, organization){
                 item.push(data.Items);
             }
             done();
-        });
+        });*/
     })
 }
 
@@ -3304,16 +3495,18 @@ function fetchOrgStaffMembers(organization) {
 }
 function getHeadAccelerationEvents(obj) {
     return new Promise((resolve, reject) => {
-        let params = {
+       /* let params = {
             TableName: 'sensor_details',
             KeyConditionExpression: "team = :team and begins_with(player_id, :player_id)",
             ExpressionAttributeValues: {
                 ":team": obj.team,
                 ":player_id": obj.player_id
             }
-        };
+        };*/
+		let params = {team :obj.team,player_id :   {$regex: obj.player_id, $options: 'i'}}
+		const sensorDetails = require("../models/sensors/sensorDetailsData");	
         var item = [];
-        docClient.query(params).eachPage((err, data, done) => {
+       sensorDetails.find(params, function (err, details) {
             if (err) {
                 console.log(err);
                 reject(err);
@@ -3348,9 +3541,8 @@ function getHeadAccelerationEvents(obj) {
                     timestamp: Number(Date.now()).toString()
                 });
             } else {
-                item.push(data.Items);
+				resolve(details);
             }
-            done();
         });
     })
     // var myObject = {
@@ -3541,7 +3733,7 @@ function getBrandOrganizationCount(obj) {
         let params = '';
 		const sensorDetails = require("../models/sensors/sensorDetailsData");		
 			var item = [];
-			sensorDetails.find({ organization: obj.organization }).count(function(err, count) {
+			sensorDetails.find({ organization: obj.organization }, function(err, count) {
 				if (err) {
 					reject(err);
 				}
@@ -3748,14 +3940,17 @@ function deleteUsers(user_cognito_id){
 
 function deleteSensorData(org_id, player_id){
     return new Promise((resolve, reject) => {
-        let params = {
+      /*  let params = {
             TableName: "sensor_details",
             Key: {
                 org_id: org_id,
                 player_id: player_id, 
             },
-        };
-        docClient.delete(params, function (err, data) {
+        }; */
+		const sensorDetails = require("./models/sensors/sensorDetailsData");
+		var params = { org_id: org_id,player_id: player_id };
+		sensorDetails.deleteOne(params, function(err, data) {	
+       // docClient.delete(params, function (err, data) {
             if (err) {
                 reject(err);
             } else {
@@ -3888,15 +4083,28 @@ function getPlayerImageDetailsByaccoutId(account_id) {
 
 function getOrgIdbyImageId(image_id) {
     return new Promise((resolve, reject) => {
-        let params = {
+       /* let params = {
             TableName: "sensor_details",
             FilterExpression: "image_id = :image_id",
             ExpressionAttributeValues: {
                ":image_id":image_id
             },
             ProjectionExpression: "org_id,player_id"
-        };
-        var item = [];
+        }; */
+		let params = {image_id : image_id}
+		const sensorDetails = require("../models/sensors/sensorDetailsData");		
+		var item = [];
+		sensorDetails.find(params, function (err, details) {
+			if (err) {
+				reject(err);
+			}
+			if (details == null) {
+				resolve([]);
+			} else {
+				resolve(details);
+			} 
+		}); 
+       /* var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
             if (err) {
                 reject(err);
@@ -3907,14 +4115,14 @@ function getOrgIdbyImageId(image_id) {
                 item.push(data.Items);
             }
             done();
-        });
+        }); */
     });
 }
 
 function updatePlayerPositions(player_id ,org_id, position, sport) {
     console.log('player_id ',player_id ,org_id, position)
     return new Promise((resolve, reject) => {
-        var params = {
+       /* var params = {
             TableName: "sensor_details",
             Key: { 
                 "org_id": org_id,
@@ -3930,8 +4138,12 @@ function updatePlayerPositions(player_id ,org_id, position, sport) {
                 "#player_position": "position",
             },
             ReturnValues:"UPDATED_NEW"
-        }
-        docClient.update(params, function (err, data) {
+        } */
+		const sensorDetails = require("./models/sensors/sensorDetailsData");
+		var myquery = { org_id: org_id,player_id: player_id };
+		var newvalues = { $set: {"player.sport": sport,"player.position": position } };
+		sensorDetails.updateOne(myquery, newvalues, function(err, res) {
+      //  docClient.update(params, function (err, data) {
             if (err) {
                 console.log("error when updating sensor data\n",err);
                 reject(err);
@@ -4065,7 +4277,7 @@ function getAllOrganizationsOfSensorBrand1(board) {
 }
 function getOrgpPlayerFromSensorDetails(playerid,org_id) {
     return new Promise((resolve, reject) => {
-        let params = {
+       /* let params = {
             TableName: "sensor_details",
             FilterExpression: "org_id = :org_id and begins_with(player_id,:player_id) ",
             ExpressionAttributeValues: {
@@ -4073,8 +4285,21 @@ function getOrgpPlayerFromSensorDetails(playerid,org_id) {
                ":org_id": org_id
             },
             ProjectionExpression: "org_id,player_id,player"
-        };
-        var item = [];
+        };*/
+		let params = {org_id : org_id,player_id :   {$regex: playerid, $options: 'i'}}
+		const sensorDetails = require("../models/sensors/sensorDetailsData");		
+		var item = [];
+		sensorDetails.find(params, function (err, details) {
+			if (err) {
+				reject(err);
+			}
+			if (details == null) {
+				resolve([]);
+			} else {
+				resolve(details);
+			} 
+		}); 
+     /*   var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
             if (err) {
                 reject(err);
@@ -4085,12 +4310,12 @@ function getOrgpPlayerFromSensorDetails(playerid,org_id) {
                 item.push(data.Items);
             }
             done();
-        });
+        });*/
     });
 }
 function getOrgpTeamFromSensorDetails(teamname,org_id) {
     return new Promise((resolve, reject) => {
-        let params = {
+        /* let params = {
             TableName: "sensor_details",
             FilterExpression: "org_id = :org_id and team = :team ",
             ExpressionAttributeValues: {
@@ -4098,7 +4323,22 @@ function getOrgpTeamFromSensorDetails(teamname,org_id) {
                ":org_id": org_id
             },
             ProjectionExpression: "org_id,team,player_id"
-        };
+        };*/
+		
+		let params = {org_id : org_id,team : teamname}
+		const sensorDetails = require("../models/sensors/sensorDetailsData");		
+		var item = [];
+		sensorDetails.find(params, function (err, details) {
+			if (err) {
+				reject(err);
+			}
+			if (details == null) {
+				resolve([]);
+			} else {
+				resolve(details);
+			} 
+		}); 
+		/*
         var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
             if (err) {
@@ -4110,20 +4350,33 @@ function getOrgpTeamFromSensorDetails(teamname,org_id) {
                 item.push(data.Items);
             }
             done();
-        });
+        });*/
     });
 }
 function getOrgFromSensorDetailsr(organization) {
     return new Promise((resolve, reject) => {
-        let params = {
+		/* let params = {
             TableName: "sensor_details",
             FilterExpression: "organization = :organization  ",
             ExpressionAttributeValues: {
                ":organization": organization,
             },
             ProjectionExpression: "org_id,team,organization"
-        };
-        var item = [];
+        };*/
+		let params = {organization : organization}
+		const sensorDetails = require("../models/sensors/sensorDetailsData");		
+		var item = [];
+		sensorDetails.find(params, function (err, details) {
+			if (err) {
+				reject(err);
+			}
+			if (details == null) {
+				resolve([]);
+			} else {
+				resolve(details);
+			} 
+		}); 
+        /*var item = [];
         docClient.scan(params).eachPage((err, data, done) => {
             if (err) {
                 reject(err);
@@ -4134,7 +4387,7 @@ function getOrgFromSensorDetailsr(organization) {
                 item.push(data.Items);
             }
             done();
-        });
+        });*/
     });
 }
 function getOrgpPlayerFromUser(user_cognito_id) { 
@@ -4184,14 +4437,17 @@ function DeleteSensorDataByPlayerID(player_id,org_id){
     return new Promise((resolve, reject) => {
 		console.log("org_id",org_id);
 		console.log("player_id",player_id);
-       let params = {
+      /* let params = {
             TableName: "sensor_details",
            Key: {
                 org_id: org_id,
                 player_id: player_id, 
             },
-        };
-        docClient.delete(params, function (err, data) {
+        };*/
+		const sensorDetails = require("./models/sensors/sensorDetailsData");
+		var params = { org_id: org_id,player_id: player_id };
+		sensorDetails.deleteOne(params, function(err, data) {	
+        //docClient.delete(params, function (err, data) {
             if (err) {
                 reject(err);
             } else {
@@ -4203,11 +4459,59 @@ function DeleteSensorDataByPlayerID(player_id,org_id){
 }
 function InsertNewSensorDataByPlayerID(obj) {
     return new Promise((resolve, reject) => {
-        var dbInsert = {
+       /* var dbInsert = {
             TableName: "sensor_details",
             Item: obj,
-        };
-        docClient.put(dbInsert, function (err, data) {
+        }; */
+		var simulation = {
+				"angular-velocity":"",
+				"angular-acceleration":"",
+				"linear-acceleration":"",
+				"mesh-transformation":"",
+				"angular-velocity":"",
+			}
+			if(obj['angular-velocity']){
+				simulation["angular-velocity"] = obj['angular-velocity'];
+			}
+			if(obj['angular-acceleration']){
+				simulation["angular-acceleration"]= obj['angular-acceleration'];
+			}
+			if(obj['linear-acceleration']){
+				simulation["linear-acceleration"]=obj['linear-acceleration'];
+			}
+			if(obj['mesh-transformation']){
+				simulation["mesh-transformation"] = obj['mesh-transformation'];
+			}
+			if(obj['la-units']){
+				simulation["la-units"] = obj['la-units'];
+			}
+			const sensorDetails = require("../models/sensors/sensorDetailsData");
+			var sensor = new sensorDetails(
+				{
+					org_id: obj.org_id, 
+					player_id: obj.player_id,
+					image_id: obj.image_id,
+					'impact-date': obj['impact-date']?obj['impact-date']:obj['date'],
+					'impact-time': obj['impact-time']?obj['impact-time']:obj['time'],
+					level: obj.level,
+					organization: obj.organization,
+					player: obj.player,
+					simulation: simulation,
+					simulation_status: obj.simulation_status,
+					team: obj.team,
+					sensor: obj.sensor,
+					user_cognito_id: obj.user_cognito_id
+				}
+			);
+			sensor.save(function (err) {
+				if (err) {					
+					reject(err);
+				}
+				else {
+					resolve(true);
+				}
+			});	 
+       /* docClient.put(dbInsert, function (err, data) {
             if (err) {
                 console.log(err);
                 reject(err);
@@ -4215,7 +4519,7 @@ function InsertNewSensorDataByPlayerID(obj) {
 		console.log("data",data);
                 resolve(data);
             }
-        });
+        });*/
     });
 }
 
