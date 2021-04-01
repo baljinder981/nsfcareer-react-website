@@ -225,10 +225,10 @@ class UserDashboarForAdmin extends React.Component {
 	  console.log("isCheckingAuth",this.state.isCheckingAuth);
 	  console.log("isAuthenticated",this.state.isAuthenticated);
     if (!this.state.cognito_user_id) {
-     // return <Redirect to="/Login" />;
+      return <Redirect to="/Login" />;
     }
     if (!this.state.isAuthenticated && !this.state.isCheckingAuth) {
-      //return <Redirect to="/Login" />;
+      return <Redirect to="/Login" />;
     }
     var the = this;
     if (this.state.isLoading) return <Spinner />;

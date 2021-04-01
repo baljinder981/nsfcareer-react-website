@@ -3327,7 +3327,7 @@ app.post(`${apiPrefix}renameTeam`, (req, res) => {
 					const sensorDetails = require("./models/sensors/sensorDetailsData");
 					var myquery = { org_id: record.org_id,player_id: record.player_id };
 					var newvalues = { $set: {team: team_name } };
-					sensorDetails.updateOne(myquery, newvalues, function(err, res) {
+					sensorDetails.updateOne(myquery, newvalues, function(err, result) { 
                    // docClient.update(params, function (err, data1) {
                         if (err) {
                             console.log("Error when updating data\n", err);
@@ -14904,7 +14904,7 @@ app.post(`${apiPrefix}deleteOrgTeam3`, (req, res) => {
                                 message: 'success',
                                 status: 200
                             })
-                        }
+                        } 
                     }).catch(err => {
                         if (count1 == sensorlen) {
                             console.log("respose 2");
@@ -14992,10 +14992,10 @@ app.post(`${apiPrefix}deleteEventByImageID`, (req, res) => {
     var playerid = data.playerid;
     var image_id = data.image_id;
     var account_id = data.account_id;
-    getPlayerSimulationFile({ image_id: data.image_id })
+    getPlayerSimulationFile({ image_id: data.image_id }) 
         .then(image_Data => {
             console.log('image_Data', image_Data)
-            getSensorDataByPlayerID(playerid.split("$")[0] + "$")
+            getSensorDataByPlayerID(playerid.split("$")[0])
                 .then(sensor_Data => {
                     var datalength = sensor_Data.length;
                     var count = 0;

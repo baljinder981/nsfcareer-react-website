@@ -3075,7 +3075,7 @@ function renameSensorOrganization(OrganizationName,player_id, org_id) {
             },
             ReturnValues: "UPDATED_NEW"
         } */
-		const sensorDetails = require("./models/sensors/sensorDetailsData");
+		const sensorDetails = require("../models/sensors/sensorDetailsData");
 		var myquery = { org_id: org_id,player_id: player_id };
 		var newvalues = { $set: {organization: OrganizationName } };
 		sensorDetails.updateOne(myquery, newvalues, function(err, res) {
@@ -3947,7 +3947,7 @@ function deleteSensorData(org_id, player_id){
                 player_id: player_id, 
             },
         }; */
-		const sensorDetails = require("./models/sensors/sensorDetailsData");
+		const sensorDetails = require("../models/sensors/sensorDetailsData");
 		var params = { org_id: org_id,player_id: player_id };
 		sensorDetails.deleteOne(params, function(err, data) {	
        // docClient.delete(params, function (err, data) {
@@ -4139,7 +4139,7 @@ function updatePlayerPositions(player_id ,org_id, position, sport) {
             },
             ReturnValues:"UPDATED_NEW"
         } */
-		const sensorDetails = require("./models/sensors/sensorDetailsData");
+		const sensorDetails = require("../models/sensors/sensorDetailsData");
 		var myquery = { org_id: org_id,player_id: player_id };
 		var newvalues = { $set: {"player.sport": sport,"player.position": position } };
 		sensorDetails.updateOne(myquery, newvalues, function(err, res) {
@@ -4444,7 +4444,7 @@ function DeleteSensorDataByPlayerID(player_id,org_id){
                 player_id: player_id, 
             },
         };*/
-		const sensorDetails = require("./models/sensors/sensorDetailsData");
+		const sensorDetails = require("../models/sensors/sensorDetailsData");
 		var params = { org_id: org_id,player_id: player_id };
 		sensorDetails.deleteOne(params, function(err, data) {	
         //docClient.delete(params, function (err, data) {
