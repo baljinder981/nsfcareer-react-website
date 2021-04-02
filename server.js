@@ -7114,11 +7114,12 @@ app.post(`${apiPrefix}getSimulationStatusCount`, (req, res) => {
     getTeamData(req.body)
         .then(sensor_data => {
             let k = 0
+			console.log("count",sensor_data.length)
             if (sensor_data.length > 0) {
                 sensor_data.forEach(function (record, index) {
                     getPlayerSimulationFile(record)
                         .then(simulation => {
-                            // console.log('simulation.status', simulation.status, 'image id -', simulation.image_id)
+                             console.log('simulation.status', simulation.status, 'image id -', simulation.image_id)
                             k++;
                             if (simulation && simulation.status === 'pending') {
                                 pending++;
@@ -7237,30 +7238,31 @@ app.post(`${apiPrefix}getCompleteSimulationList`, (req, res) => {
     let failedList = {};
     getTeamData(req.body)
         .then(sensor_data => {
-            console.log('sensor_data', sensor_data)
-            //..
+           
             let k = 0
             if (sensor_data.length > 0) {
                 sensor_data.forEach(function (record, index) {
-                    console.log('record', record);
                     var player = record.player['first-name'] + '-' + record.player['last-name'] + '-' + record.player_id;
-                    var sensorData = record;
-                    getPlayerSimulationFile(record)
+					getPlayerSimulationFile(record)
                         .then(simulation => {
-                            console.log('simulation', simulation)
-                            k++
-                            if (simulation.status == 'completed') {
-                                sensorData['account_id'] = simulation.account_id ? simulation.account_id : 'N/A';
-                                sensorData['model'] = simulation.mesh ? simulation.mesh : 'N/A';
-                                sensorData['submitting_admin'] = simulation.admin_detail ? simulation.admin_detail : 'N/A';
-                                sensorData['simulation_id'] = simulation.log_stream_name ? simulation.log_stream_name.split('/')[2] : 'N/A';
-                                sensorData['computed_time'] = timeConversion(simulation.computed_time) ? timeConversion(simulation.computed_time) : 'N/A';
-                                failedList[player] = [];
-                                failedList[player].push(sensorData);
+                    var sensorData = {}
+							console.log('record ------------------',typeof record )
+                            k++ 
+                            if (simulation["status"] == 'completed') {
+								console.log("account_ids",simulation["account_id"])
+                                sensorData["account_id"] = simulation["account_id"] ? simulation["account_id"] : 'N/A';;
+                                sensorData['model'] = simulation["mesh"] ? simulation["mesh"] : 'N/A';
+                                sensorData['submitting_admin'] = simulation["admin_detail"] ? simulation["admin_detail"] : 'N/A';
+                                sensorData['simulation_id'] = simulation["log_stream_name"] ? simulation["log_stream_name"].split('/')[2] : 'N/A';
+                                sensorData['computed_time'] = timeConversion(simulation["computed_time"]) ? timeConversion(simulation["computed_time"]) : 'N/A';
+								console.log("sensorData ------------------",sensorData)
+                              //  failedList[player] = [];
+                                failedList[player]= sensorData;	  							
                             }
                             if (k == sensor_data.length) {
+								console.log("failedList ------------------",failedList)
                                 res.send({
-                                    message: "success",
+                                    message: "success", 
                                     data: failedList
                                 })
                             }
@@ -8447,7 +8449,7 @@ app.post(`${apiPrefix}getMpsRankedData`, (req, res) => {
                         // X- Axis Angular Acceleration
                         let angular_acceleration = accData['impact-date'] ? accData.simulation['angular-acceleration'] : accData['angular-acceleration'];
                         // Y Axis timestamp
-                        let time = accData['impact-date'] ? accData.simulation['linear-acceleration']['xt'] : accData['linear-acceleration']['xt'];
+                        let time = accData['impact-date'] ? accData.simulation['linear-acceleration']['xt'] : accData['linear-acceleration']? accData['linear-acceleration']['xt']:[];
                         time = time ? time : [];
 
                         time.forEach((t, i) => {
@@ -8580,8 +8582,8 @@ app.post(`${apiPrefix}getCumulativeAccelerationTimeRecords`, (req, res) => {
                         // X- Axis Angular Acceleration
                         let angular_acceleration = accData['impact-date'] ? accData.simulation['angular-acceleration'] : accData['angular-acceleration'];
                         // Y Axis timestamp
-						console.log("accData",accData);
-                        let time = accData['impact-date'] ? accData.simulation['linear-acceleration'].xt : accData['linear-acceleration'].xt;
+						console.log("accData",accData['linear-acceleration']);
+                        let time = accData['impact-date'] ? accData.simulation['linear-acceleration'].xt : accData['linear-acceleration']?accData['linear-acceleration'].xt:[];
                         time = time ? time : [];
 
                         // console.log(time);

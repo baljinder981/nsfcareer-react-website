@@ -51,8 +51,8 @@ class CompleteSimulationList extends React.Component {
                             
       }
     }).then(response => {
-      console.log('response',response);
       var data = response.data;
+      console.log('response',response);
       if(data.message === "success"){
         this.setState({
           simulationList: data.data,
@@ -144,20 +144,20 @@ class CompleteSimulationList extends React.Component {
 					<tbody className="player-table">
               {simulationList && 
                 Object.entries(simulationList).map(([key, data]) => {
-                   console.log('res',key, data)
+                   console.log('res', data)
                   var name = key.split('-');
                   return <tr className="player-name">
 					<td className="player-collapes-div" style={{'margin-bottom': '25px','border':'1px solid #084371'}}>
-						{data[0]["simulation_id"]}                     
+						{data["simulation_id"]}                     
                     </td>
                     <td className="player-collapes-div" style={{'margin-bottom': '25px','border':'1px solid #084371'}}>						
-                      {data[0]["submitting_admin"] !== "N/A" ? data[0]["submitting_admin"]['name'] : "N/A"}
+                      {data["submitting_admin"]? data["submitting_admin"]['name'] : "N/A"}
                     </td>
                     <td className="player-collapes-div" style={{'margin-bottom': '25px','border':'1px solid #084371'}}> 
-                      {data[0]["model"]} 
+                      {data["model"]} 
                     </td>
                     <td className="player-collapes-div" style={{'margin-bottom': '25px','border':'1px solid #084371'}}>
-                       {data[0]["computed_time"]}   
+                       {data["computed_time"]}   
                     </td>
                     </tr>
                     
