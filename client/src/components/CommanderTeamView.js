@@ -634,7 +634,7 @@ class CommanderTeamView extends React.Component {
     }
 
     getUrl = (obj) => {
-        if (obj && this.state.userDetails.level > 300) {
+        if (obj && this.state.userDetails.level >= 300) {
             // eslint-disable-next-line
             console.log("obj", obj);
             return <a className="btn btn-primary" target='_blank' href={"/profile?id=" + obj.account_id}>Profile</a>;

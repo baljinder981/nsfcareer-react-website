@@ -4946,8 +4946,8 @@ app.post(`${apiPrefix}getAvatarInspection`, VerifyToken, (req, res) => {
             if (err) {
                 userData["brain_ply"] = "";
                 res.send({
-                    message: "failure",
-                    data: userData
+                    message: "failure 4",
+                    data: err
                 })
             }
             else {
@@ -4956,8 +4956,8 @@ app.post(`${apiPrefix}getAvatarInspection`, VerifyToken, (req, res) => {
                     if (err) {
                         userData["skull_ply"] = "";
                         res.send({
-                            message: "failure",
-                            data: userData
+                            message: "failure 3",
+                            data: err
                         })
                     }
                     else {
@@ -4966,8 +4966,8 @@ app.post(`${apiPrefix}getAvatarInspection`, VerifyToken, (req, res) => {
                             if (err) {
                                 userData["model_ply"] = "";
                                 res.send({
-                                    message: "failure",
-                                    data: userData
+                                    message: "failure 2",
+                                    data: err
                                 })
                             }
                             else {
@@ -4976,8 +4976,8 @@ app.post(`${apiPrefix}getAvatarInspection`, VerifyToken, (req, res) => {
                                     if (err) {
                                         userData["model_jpg"] = "";
                                         res.send({
-                                            message: "failure",
-                                            data: userData
+                                            message: "failure 1",
+                                            data: err
                                         })
                                     }
                                     else {
@@ -14676,7 +14676,7 @@ function getBrainImageLink(account_id, image_id, file) {
                                 resolve('');
                             }
                         })
-
+ 
                 }
             });
         } else {

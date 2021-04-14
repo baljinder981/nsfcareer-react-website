@@ -70,7 +70,6 @@ class BrainSubmitPortal extends React.Component {
 
     handleUpLoadedFiles = (files) => {
         console.log('handleUpLoadedFiles', files);
-        // console.log('files',files);
         this.setState({ files: [], isDragMod: false, isCalledExists: false })
         for (var i = 0; i < files.length; i++) {
             let file = this.getUploadFileExtension3(files[i].path);
@@ -239,27 +238,7 @@ class BrainSubmitPortal extends React.Component {
             })
     }
 
-    setListSimulationStatus = (status, key, isfetched) => {
-        key = parseInt(key);
-        console.log('setListSimulationStatus', status, key, isfetched);
-        let list = this.state.list;
-        var newList = [];
-        this.setState({ list: [] });
-        for (var i = 0; i < list.length; i++) {
-            if (i === key) {
-                list[i].isExists = status;
-                list[i].isfetched = isfetched;
-                newList.push(list[i]);
-                // this.setState(prevState => ({
-                //     files: prevState.files.concat(file[i])
-                // }))
-            } else {
-                newList.push(list[i]);
-            }
-        }
-        this.setState({ list: newList })
-
-    }
+   
 
 
     handleRemoveFile = (key) => {
@@ -321,7 +300,62 @@ class BrainSubmitPortal extends React.Component {
             this.setState({ isDragMod: true });
         }
     }
+	 setListSimulationStatus = (status, key, isfetched) => {
+        key = parseInt(key);
+        console.log('setListSimulationStatus', status, key, isfetched);
+        let list = this.state.list;
+        var newList = [];
+        this.setState({ list: [] });
+        for (var i = 0; i < list.length; i++) {
+            if (i === key) {
+                list[i].isExists = status;
+                list[i].isfetched = isfetched;
+                newList.push(list[i]);
+                // this.setState(prevState => ({
+                //     files: prevState.files.concat(file[i])
+                // }))
+            } else {
+                newList.push(list[i]);
+            }
+        }
+        this.setState({ list: newList })
 
+    }
+	 setListSimulation = (file,user,list,index,meshType,sensor,organization,team) => {
+
+		return new Promise((resolve, reject) => {
+		console.log('file', file);
+		var formdata = new FormData();
+		formdata.append("user", user);
+		formdata.append("filename", file);
+		formdata.append("overwrite", "true");
+		formdata.append("fileNum", index);
+		formdata.append("mesh", meshType);
+		formdata.append("sensor", sensor);
+		formdata.append("organization", organization);
+		formdata.append("team", team);
+
+		if (list[index].imageFile) {
+			formdata.append("selfie", list[index].imageFile);
+		}
+		submitBrainsimulationJobs(formdata)
+			.then(res => {
+				console.log('res', res)
+				if (res.data.message === "success") {
+					this.setListSimulationStatus('uploaded', res.data.fileNum, 1);
+					resolve("uploaded");
+				} else {
+					this.setListSimulationStatus(0, res.data.fileNum, 1);
+					this.setState({ isError: 'Failed to submit jobs. Please try again.',uploadingJobs: false });
+					resolve("Failed to submit jobs. Please try again.");
+				}
+			}).catch(err => {
+				alert('failed to create jobs');
+				resolve('failed to create jobs');
+				this.setState({uploadingJobs: false});
+			});
+		})
+	}
     handelSubmit = (e) => {
         e.preventDefault();
         $('#submit').prop('disabled', true);//#disable submit button on submit click...
@@ -334,13 +368,11 @@ class BrainSubmitPortal extends React.Component {
         if(sensor !== 'Linx IAS'){
             createJoblogs({ email: user, listJobs: listJobs })
             .then(res => {
-                console.log('res', res);
+               // console.log('res', res);
             }).catch(err => {
-                console.log('err', err)
+               // console.log('err', err)
             })
         }
-      
-
         const reloadPage = () => {
             setInterval(() => {
                 this.setState(prevState => ({
@@ -350,52 +382,28 @@ class BrainSubmitPortal extends React.Component {
         }
         this.setState({ uploadingJobs: true })
         // console.log('listJobs',Email, listJobs);
-        let count = 0;
-        if (files[0]) {
-            for (var i = 0; i < files.length; i++) {
-                this.setListSimulationStatus('loading', i, 0);
-                console.log('file', files[i]);
-                var formdata = new FormData();
-                formdata.append("user", user);
-                formdata.append("filename", files[i]);
-                formdata.append("overwrite", "true");
-                formdata.append("fileNum", i);
-                formdata.append("mesh", meshType);
-                formdata.append("sensor", sensor);
-                formdata.append("organization", organization);
-                formdata.append("team", team);
+        var count = 0;
+        var files_length = files.length;
+        if (files_length > 0) {
+			var This = this;
+            files.map(async function (data, index) {
+console.log("index",index)				
+console.log("data",data)				
+			   This.setListSimulationStatus('loading', index, 0);
+               var response = await This.setListSimulation(data,user,list,index,meshType,sensor,organization,team);
+			   count++;
+			   if (count === files_length) {
+					if (!This.state.isError) {
+						reloadPage();
+						This.setState({
+							isUploaded: true,
+							uploadingJobs: false
+						})
+					}
 
-                if (list[i].imageFile) {
-                    formdata.append("selfie", list[i].imageFile);
-                }
-                //# creating new jobs...
-                submitBrainsimulationJobs(formdata)
-                    .then(res => {
-                        console.log('res', res)
-                        if (res.data.message === "success") {
-                            this.setListSimulationStatus('uploaded', res.data.fileNum, 1);
-                        } else {
-                            this.setListSimulationStatus(0, res.data.fileNum, 1);
-                            this.setState({ isError: 'Failed to submit jobs. Please try again.',uploadingJobs: false });
-                        }
-                        count++;
-                        if (count === files.length) {
-                            if (!this.state.isError) {
-                                reloadPage();
-                                this.setState({
-                                    isUploaded: true,
-                                    uploadingJobs: false
-                                })
-                            }
-
-                        }
-                    }).catch(err => {
-                        alert('failed to create jobs');
-                        this.setState({uploadingJobs: false});
-                    });
-            }
+				}
+            })
         }
-
     }
     render() {
         console.log('team =---------------------', this.props.team)

@@ -482,6 +482,7 @@ class Profile extends React.Component {
                 
                 getAvatarInspection({ user_cognito_id: this.state.user.account_id ? this.state.user.account_id : this.state.profile_to_view})
                 .then(result => {
+					console.log("inspection_data -------1--------",result);
                     let inspection_data = '';
                     if (result.data.data.model_jpg && result.data.data.model_ply && result.data.data.brain_ply && result.data.data.skull_ply) {
                         inspection_data = result.data.data;
@@ -952,7 +953,7 @@ class Profile extends React.Component {
         //     };
         //   },
         // };
-
+console.log("inspection_data------------------",this.state.inspection_data);
         return (
             <React.Fragment>
             {
@@ -1994,7 +1995,7 @@ class Profile extends React.Component {
                                         return getAvatarInspection({ user_cognito_id: this.state.user.account_id ? this.state.user.account_id : this.state.profile_to_view})
                                     })
                                     .then(result => {
-                                        console.log('getAvatarInspection ----------------------\n',result)
+                                        console.log('getAvatarInspection -----------2-----------\n',result)
                                         let inspection_data = '';
                                         if (result.data.data.model_jpg && result.data.data.model_ply && result.data.data.brain_ply && result.data.data.skull_ply) {
                                             inspection_data = result.data.data;
@@ -2008,7 +2009,7 @@ class Profile extends React.Component {
                                         
                                     })
                                     .catch((error) => {
-                                        console.log('getAvatarInspection error----------------------\n',error)
+                                        console.log('getAvatarInspection error---------3-------------\n',error)
                                         this.setState({
                                            isLoading: false,
                                             isAuthenticated: true,
