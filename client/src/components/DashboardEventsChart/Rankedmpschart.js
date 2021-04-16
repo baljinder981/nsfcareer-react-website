@@ -27,6 +27,7 @@ const options = {
             },
             ticks: {
                 suggestedMin: 0,
+                display: true,
             }
 
         }],
@@ -36,11 +37,13 @@ const options = {
                 labelString: 'Element Count'
             },
             ticks: {
-                stepSize: 200,
-                display: false,
+				suggestedMin: 0,
+                display: true,	
+				fontColor: "#ffffff",  
             },
 			gridLines: {
-                drawOnChartArea:false
+                drawOnChartArea:false,
+				drawBorder: false,
             }
         }]
     }
@@ -72,11 +75,12 @@ class Rankedmpschart extends React.Component {
             }
             return arr;
         }
-        var label = makeArr(0, max_element_val, max_element_val);
+		var label = makeArr(0, max_element_val, max_element_val);
+       // var label = makeArr(0, 100, 100);
         // console.log('label ----------------------------\n',label)
 
         pointsData.sort(function (a, b) {
-            return a.x - b.x; 
+            return b.y - a.y; 
         })
 
         console.log('pointsData', pointsData)
@@ -93,7 +97,6 @@ class Rankedmpschart extends React.Component {
                     fill: false,
                     data: pointsData,
                 }]
-
             },
         };
 
